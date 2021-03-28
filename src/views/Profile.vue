@@ -3,98 +3,53 @@
 		<v-app id="inspire">
 			<v-row justify="center">
 				<v-dialog v-model="dialog" persistent max-width="600px">
-					<template v-slot:activator="{ on, attrs }">
-						<v-btn color="primary" dark v-bind="attrs" v-on="on">
-							Open Dialog
-						</v-btn>
-					</template>
 					<v-card>
-						<v-card-title>
-							<span class="headline">User Profile</span>
-						</v-card-title>
 						<v-card-text>
 							<v-container>
 								<v-row>
 									<v-col cols="12" sm="6" md="4">
-										<v-text-field
-											label="Legal first name*"
-											required
-										></v-text-field>
+										<v-avatar size="150">
+											<v-img
+												max-height="250"
+												max-width="350"
+												:src="avatar_url"
+											></v-img>
+										</v-avatar>
 									</v-col>
 									<v-col cols="12" sm="6" md="4">
-										<v-text-field
-											label="Legal middle name"
-											hint="example of helper text only on focus"
-										></v-text-field>
+										<h2>{{ user.username }} Profile</h2>
+										id: {{ user.user_id }}
 									</v-col>
-									<v-col cols="12" sm="6" md="4">
+									<v-col cols="12">
 										<v-text-field
-											label="Legal last name*"
-											hint="example of persistent helper text"
-											persistent-hint
+											label="Username"
+											v-model="username"
 											required
 										></v-text-field>
 									</v-col>
 									<v-col cols="12">
 										<v-text-field
-											label="Email*"
+											label="Name"
+											v-model="name"
 											required
 										></v-text-field>
 									</v-col>
 									<v-col cols="12">
 										<v-text-field
-											label="Password*"
-											type="password"
+											label="Avatar url"
+											v-model="avatar_url"
 											required
 										></v-text-field>
-									</v-col>
-									<v-col cols="12" sm="6">
-										<v-select
-											:items="[
-												'0-17',
-												'18-29',
-												'30-54',
-												'54+',
-											]"
-											label="Age*"
-											required
-										></v-select>
-									</v-col>
-									<v-col cols="12" sm="6">
-										<v-autocomplete
-											:items="[
-												'Skiing',
-												'Ice hockey',
-												'Soccer',
-												'Basketball',
-												'Hockey',
-												'Reading',
-												'Writing',
-												'Coding',
-												'Basejump',
-											]"
-											label="Interests"
-											multiple
-										></v-autocomplete>
 									</v-col>
 								</v-row>
 							</v-container>
-							<small>*indicates required field</small>
 						</v-card-text>
 						<v-card-actions>
 							<v-spacer></v-spacer>
-							<v-btn
-								color="blue darken-1"
-								text
-								@click="dialog = false"
-							>
+							<v-btn color="blue darken-1" text @click="close">
 								Close
 							</v-btn>
-							<v-btn
-								color="blue darken-1"
-								text
-								@click="dialog = false"
-							>
+							<v-btn color="blue darken-1" text @click="save">
 								Save
 							</v-btn>
 						</v-card-actions>
@@ -106,16 +61,59 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters } from "vuex";
+import axios from "axios";
 
 export default {
-	name: 'Profile',
+	name: "Profile",
 	data: () => ({
-		dialog: false,
+		dialog: true,
+		username: "",
+		name: "",
+		avatar_url: "",
 	}),
+	async created() {
+		console.log(this.$store.getters.isLogin);
+		const token = localStorage.getItem("token");
+		if (token) {
+			await axios
+				.get("users/me", { Authorization: this.token })
+				.then((response) => {
+					this.$store.commit("user", response.data);
+					this.$store.commit("isLogin", true);
+					console.log(response.data);
+					this.username = response.data.username;
+					this.name = response.data.name;
+					this.avatar_url = response.data.avatar;
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		}
+	},
 	computed: {
-		...mapGetters(['user', 'token'])
-	}
+		...mapGetters(["user", "token"]),
+	},
+	methods: {
+		close() {
+			this.$router.push("/");
+		},
+		async save() {
+			await axios.put("users",{ 
+				username: this.username,
+				name: this.name,
+				avatar: this.avatar_url,
+				Authorization: this.token
+			})
+			.then((response) => {
+				console.log(response);
+				this.$router.push("/");
+			})
+			.catch((error) => {
+				console.log(error);
+			})
+		},
+	},
 };
 </script>
 

@@ -132,7 +132,6 @@ export default {
 			styles: { container: { borderRadius: "4px" } },
 			info: {},
 			count: 0,
-			// ,dbRequestCount: 0
 		};
 	},
 

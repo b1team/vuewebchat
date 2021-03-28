@@ -31,8 +31,13 @@
 				<button @click="theme = 'dark'" class="button-dark">
 					Dark
 				</button>
-				<button class="button-github">
-					<a href="https://github.com/antoine92190/vue-advanced-chat">
+				<button class="button-github" title="Link to fontend">
+					<a href="https://github.com/b1team/vuewebchat">
+						<img src="@/assets/github.svg" />
+					</a>
+				</button>
+				<button class="button-github" title="Link to backend">
+					<a href="https://github.com/b1team/trada">
 						<img src="@/assets/github.svg" />
 					</a>
 				</button>
