@@ -114,11 +114,8 @@
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
 	name: "Login",
-	computed: {},
 	data: () => ({
 		dialog: true,
 		valid: true,
@@ -134,24 +131,16 @@ export default {
 		},
 	}),
 	methods: {
-		async validate() {
+		validate: function() {
 			if (this.$refs.loginForm.validate()) {
-				// submit form to server/API here...
-				await axios
-					.post("token", {
-						username: this.user.loginUsername,
-						password: this.user.loginPassword,
-					})
-					.then((response) => {
-						localStorage.setItem("token", response.data.access_token);
-						this.$store.commit('token', response.data.access_token);
-						this.$store.commit('isLogin', true);
-						localStorage.setItem("isLogin", true);
-						this.$router.push("/");
-					})
-					.catch((error) => {
-						console.log(error);
-					})
+				let user = {
+					username: this.user.loginUsername,
+					password: this.user.loginPassword,
+				};
+				this.$store
+					.dispatch("login", user)
+					.then(() => this.$router.push("/"))
+					.catch((err) => console.log(err));
 			}
 		},
 		reset() {

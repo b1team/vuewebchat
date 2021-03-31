@@ -7,6 +7,9 @@ npm install
 
 ### Compiles and hot-reloads for development
 ```
+create .env
+change API_URL in .env file
+
 npm run serve
 ```
 

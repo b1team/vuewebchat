@@ -1,0 +1,155 @@
+import { formatTimestamp } from "../../utils/dates";
+import axios from "axios";
+
+const state = {
+	rooms: null,
+};
+
+const getters = {
+	rooms: (state) => state.rooms,
+};
+
+const actions = {
+	fetchAllRooms({ commit }) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "get",
+				url: "rooms",
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					const list_rooms = [];
+					const rooms = response.data.rooms;
+					for (var room of rooms) {
+						const room_format = {
+							roomId: room.id,
+							roomName: room.room_name,
+							avatar: room.avatar,
+							unreadCount: room.unreadCount,
+							lastMessage: {
+								content: room.last_message.content,
+								senderId: room.last_message.sender_id,
+								username: room.last_message.username,
+								timestamp: formatTimestamp(
+									new Date(room.last_message.timestamp),
+									new Date(room.last_message.timestamp)
+								),
+								saved: true,
+								seen: room.last_message.seen,
+								new: true,
+							},
+							users: [],
+						};
+						list_rooms.push(room_format);
+					}
+					commit("rooms", list_rooms);
+					resolve(response);
+				})
+				.catch((error) => {
+					reject(error);
+					console.error(error);
+				});
+		});
+	},
+
+	createRoom({ commit }, roomName) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "post",
+				url: "rooms?room_name=" + roomName,
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					commit();
+					resolve(response);
+					console.log(response);
+				})
+				.catch((error) => {
+					reject(error);
+					console.log(error);
+				});
+		});
+	},
+
+	addUser({ commit }, { roomId, memberName }) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "post",
+				url: "rooms/invite",
+				data: {
+					room_id: roomId,
+					member_name: memberName,
+				},
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					commit();
+					resolve(response);
+				})
+				.catch((error) => {
+					reject(error);
+				});
+		});
+	},
+
+	removeUser({ commit }, { roomId, userName }) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "delete",
+				url: "rooms/remove",
+				data: {
+					room_id: roomId,
+					member_name: userName,
+				},
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					commit();
+					resolve(response);
+				})
+				.catch((error) => {
+					reject(error);
+				});
+		});
+	},
+
+	removeRoom({ commit }, roomId) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "delete",
+				url: "rooms?room_id=" + roomId,
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					commit();
+					resolve(response);
+				})
+				.catch((error) => {
+					reject(error);
+				});
+		});
+	},
+};
+
+const mutations = {
+	rooms(state, rooms) {
+		state.rooms = rooms;
+	},
+};
+
+export default {
+	state,
+	getters,
+	actions,
+	mutations,
+};

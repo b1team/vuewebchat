@@ -6,11 +6,9 @@ import VueAxios from "vue-axios";
 
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';
-axios.defaults.baseURL = "http://0.0.0.0:5000/";
-// axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
+axios.defaults.baseURL = process.env.VUE_APP_API_URL;
+
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
-axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 let config = {
 	// baseURL: process.env.baseURL || process.env.apiUrl || ""
 	// timeout: 60 * 1000, // Timeout

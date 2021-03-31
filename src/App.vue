@@ -1,34 +1,53 @@
 <template>
 	<div id="app">
 		<div id="nav">
-			<router-link to="/">Home</router-link> |
-			<router-link to="/login" v-if="!isLogin" >Login | </router-link>
-			<router-link to="/register" v-if="!isLogin" >Register | </router-link>
-			<router-link to="/profile">Profile</router-link> |
-			<a href="javascript:void(0)" @click="logout" v-if="isLogin"> Logout</a>
+			<router-link to="/" v-if="isLogin">Home |</router-link>
+			<router-link to="/login" v-if="!isLogin">Login |</router-link>
+			<router-link to="/register" v-if="!isLogin">Register |</router-link>
+			<router-link to="/profile" v-if="isLogin">Profile |</router-link>
+			<a href="javascript:void(0)" @click="logout" v-if="isLogin">
+				Logout</a
+			>
 		</div>
-		<router-view/>
+		<router-view />
 	</div>
 </template>
 
 <script lang="ts">
-import {mapGetters} from 'vuex';
-
+import axios from "axios";
 export default {
+	beforeDestroy() {
+		this.logout();
+	},
 	methods: {
-		logout() {
-			localStorage.removeItem('token');
-			this.$store.dispatch('token', null);
-			localStorage.removeItem('user');
-			this.$store.commit('user', {});
-			this.$store.dispatch('isLogin', false);
-			localStorage.removeItem('isLogin');
-			this.$router.push("/login")
-		}
+		logout: function() {
+			this.$store.dispatch("logout").then(() => {
+				this.$router.push("/login");
+			});
+		},
 	},
 	computed: {
-		...mapGetters(['isLogin']),
-	}
+		isLogin: function() {
+			return this.$store.getters.isLogin;
+		},
+	},
+	created: function() {
+		axios.interceptors.response.use(undefined, function(err) {
+			return new Promise(function(resolve, reject) {
+				if (
+					err.status === 401 &&
+					err.config &&
+					!err.config.__isRetryRequest
+				) {
+					this.$store.dispatch('logout');
+					resolve(true);
+					this.$router.push("/login");
+				}
+				reject(err);
+				throw err;
+			});
+		});
+	},
 };
 </script>
 
@@ -43,10 +62,10 @@ export default {
 
 #nav {
 	padding: 30px;
-
 	a {
 		font-weight: bold;
 		color: #2c3e50;
+		text-decoration: none;
 
 		&.router-link-exact-active {
 			color: #42b983;

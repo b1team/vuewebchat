@@ -62,7 +62,6 @@
 
 <script>
 import { mapGetters } from "vuex";
-import axios from "axios";
 
 export default {
 	name: "Profile",
@@ -73,22 +72,11 @@ export default {
 		avatar_url: "",
 	}),
 	async created() {
-		console.log(this.$store.getters.isLogin);
-		const token = localStorage.getItem("token");
+		const token = this.token;
 		if (token) {
-			await axios
-				.get("users/me", { Authorization: this.token })
-				.then((response) => {
-					this.$store.commit("user", response.data);
-					this.$store.commit("isLogin", true);
-					console.log(response.data);
-					this.username = response.data.username;
-					this.name = response.data.name;
-					this.avatar_url = response.data.avatar;
-				})
-				.catch((error) => {
-					console.log(error);
-				});
+			this.username = this.user.username;
+			this.name = this.user.name;
+			this.avatar_url = this.user.avatar;
 		}
 	},
 	computed: {
@@ -99,19 +87,17 @@ export default {
 			this.$router.push("/");
 		},
 		async save() {
-			await axios.put("users",{ 
+			let data = {
 				username: this.username,
 				name: this.name,
 				avatar: this.avatar_url,
-				Authorization: this.token
-			})
-			.then((response) => {
-				console.log(response);
-				this.$router.push("/");
-			})
-			.catch((error) => {
-				console.log(error);
-			})
+			};
+
+			this.$store
+				.dispatch("changeProfile", data)
+				.then(() =>
+					this.$router.push("/").catch((err) => console.log(err))
+				);
 		},
 	},
 };

@@ -56,10 +56,8 @@
 				@edit-message="editMessage"
 				@delete-message="deleteMessage"
 				@open-file="openFile"
-				@open-user-tag="openUserTag"
 				@menu-action-handler="menuActionHandler"
 				@message-action-handler="messageActionHandler"
-				@typing-message="typingMessage"
 				@textarea-action-handler="textareaActionHandler"
 			>
 				<template v-for="(i, name) in $scopedSlots" #[name]="data">
@@ -111,10 +109,8 @@ export default {
 		},
 		showAddRoom: { type: Boolean, default: true },
 		showSendIcon: { type: Boolean, default: true },
-		showFiles: { type: Boolean, default: true },
 		showAudio: { type: Boolean, default: true },
 		showEmojis: { type: Boolean, default: true },
-		showReactionEmojis: { type: Boolean, default: true },
 		showNewMessagesDivider: { type: Boolean, default: true },
 		showFooter: { type: Boolean, default: true },
 		textFormatting: { type: Boolean, default: true },
@@ -277,9 +273,6 @@ export default {
 		openFile({ message, action }) {
 			this.$emit('open-file', { message, action })
 		},
-		openUserTag({ user }) {
-			this.$emit('open-user-tag', { user })
-		},
 		menuActionHandler(ev) {
 			this.$emit('menu-action-handler', {
 				action: ev,
@@ -295,18 +288,6 @@ export default {
 		messageActionHandler(ev) {
 			this.$emit('message-action-handler', {
 				...ev,
-				roomId: this.room.roomId
-			})
-		},
-		sendMessageReaction(messageReaction) {
-			this.$emit('send-message-reaction', {
-				...messageReaction,
-				roomId: this.room.roomId
-			})
-		},
-		typingMessage(message) {
-			this.$emit('typing-message', {
-				message,
 				roomId: this.room.roomId
 			})
 		},

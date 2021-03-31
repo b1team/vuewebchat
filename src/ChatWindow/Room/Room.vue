@@ -79,7 +79,6 @@
 								:text-messages="textMessages"
 								:room-footer-ref="$refs.roomFooter"
 								:new-messages="newMessages"
-								:show-reaction-emojis="showReactionEmojis"
 								:show-new-messages-divider="showNewMessagesDivider"
 								:text-formatting="textFormatting"
 								:emojis-list="emojisList"
@@ -87,7 +86,6 @@
 								@message-action-handler="messageActionHandler"
 								@open-file="openFile"
 								@open-user-tag="openUserTag"
-								@send-message-reaction="sendMessageReaction"
 								@hide-options="hideOptions = $event"
 							>
 								<template v-for="(idx, name) in $scopedSlots" #[name]="data">
@@ -275,7 +273,6 @@
 					</emoji-picker>
 
 					<div
-						v-if="showFiles"
 						class="vac-svg-button"
 						@click="launchFilePicker"
 					>
@@ -295,7 +292,6 @@
 					</div>
 
 					<input
-						v-if="showFiles"
 						ref="file"
 						type="file"
 						:accept="acceptedFiles"
@@ -373,10 +369,8 @@ export default {
 		menuActions: { type: Array, required: true },
 		messageActions: { type: Array, required: true },
 		showSendIcon: { type: Boolean, required: true },
-		showFiles: { type: Boolean, required: true },
 		showAudio: { type: Boolean, required: true },
 		showEmojis: { type: Boolean, required: true },
-		showReactionEmojis: { type: Boolean, required: true },
 		showNewMessagesDivider: { type: Boolean, required: true },
 		showFooter: { type: Boolean, required: true },
 		acceptedFiles: { type: String, required: true },
@@ -700,7 +694,6 @@ export default {
 			else this.resetMessage()
 		},
 		resetMessage(disableMobileFocus = null, editFile = null) {
-			this.$emit('typing-message', null)
 
 			if (editFile) {
 				this.file = null
@@ -816,9 +809,6 @@ export default {
 					return this.$emit('message-action-handler', { action, message })
 			}
 		},
-		sendMessageReaction(messageReaction) {
-			this.$emit('send-message-reaction', messageReaction)
-		},
 		replyMessage(message) {
 			this.messageReply = message
 			this.focusTextarea()
@@ -853,7 +843,6 @@ export default {
 		onChangeInput() {
 			this.keepKeyboardOpen = true
 			this.resizeTextarea()
-			this.$emit('typing-message', this.message)
 		},
 		resizeTextarea() {
 			const el = this.$refs['roomTextarea']

@@ -6,7 +6,7 @@
 			:style="{
 				display: hoverAudioProgress ? 'none' : 'initial',
 				width:
-					filteredMessageActions.length && showReactionEmojis ? '70px' : '45px'
+					filteredMessageActions.length ? '70px' : '45px'
 			}"
 		>
 			<transition-group name="vac-slide-left">
@@ -41,7 +41,6 @@
 					:emoji-reaction="true"
 					:room-footer-ref="roomFooterRef"
 					:position-right="message.senderId === currentUserId"
-					@add-emoji="sendMessageReaction"
 					@open-emoji="openEmoji"
 				>
 					<template #emoji-picker-icon>
@@ -102,7 +101,6 @@ export default {
 		message: { type: Object, required: true },
 		messageActions: { type: Array, required: true },
 		roomFooterRef: { type: HTMLDivElement, default: null },
-		showReactionEmojis: { type: Boolean, required: true },
 		hideOptions: { type: Boolean, required: true },
 		messageHover: { type: Boolean, required: true },
 		hoverMessageId: { type: [String, Number], default: null },
@@ -133,7 +131,6 @@ export default {
 		},
 		isMessageReactions() {
 			return (
-				this.showReactionEmojis &&
 				this.messageHover &&
 				!this.message.deleted &&
 				!this.message.disableReactions &&
@@ -217,10 +214,6 @@ export default {
 			this.closeOptions()
 			this.$emit('message-action-handler', action)
 		},
-		sendMessageReaction(emoji, reaction) {
-			this.$emit('send-message-reaction', { emoji, reaction })
-			this.closeEmoji()
-		}
 	}
 }
 </script>

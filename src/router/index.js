@@ -4,11 +4,12 @@ import Home from "../views/Home.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Profile from "../views/Profile.vue";
+import store from "../store"
 
 Vue.use(VueRouter);
 
 const ifNotAuthenticated = (to, from, next) => {
-	if (!localStorage.getItem('isLogin')) {
+	if (!store.getters.isLogin) {
 		next();
 		return;
 	}
@@ -16,7 +17,7 @@ const ifNotAuthenticated = (to, from, next) => {
 };
 
 const ifAuthenticated = (to, from, next) => {
-	if (localStorage.getItem('isLogin')) {
+	if (store.getters.isLogin) {
 		next();
 		return;
 	}

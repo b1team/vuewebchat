@@ -1,0 +1,205 @@
+import axios from "axios";
+import { formatTimestamp } from "../../utils/dates";
+
+Date.prototype.addHours = function(h) {
+	this.setHours(this.getHours() + h);
+	return this;
+};
+
+Date.prototype.addMonth = function(h) {
+	this.setMonth(this.getMonth() + h);
+	return this;
+};
+
+const state = {
+	listMessages: null,
+	messageLoaded: false,
+	lastMessage: null,
+	newMessage: null,
+	idRoom: null,
+	editMessageContent: null,
+	editMessageId: null,
+	deleteMessage: null,
+};
+
+const getters = {
+	listMessages: (state) => state.listMessages,
+	messageLoaded: (state) => state.messageLoaded,
+	lastMessage: (state) => state.lastMessage,
+	newMessage: (state) => state.newMessage,
+	idRoom: (state) => state.idRoom,
+	editMessageContent: (state) => state.editMessageContent,
+	editMessageId: (state) => state.editMessageId,
+	deleteMessage: (state) => state.deleteMessage,
+};
+
+const actions = {
+	fetchRoomMessage({ commit }, roomId) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "get",
+				url: "messages/room?room_id=" + roomId,
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					const messages = [];
+					var index = 0;
+					const list_messages = response.data.messages;
+					if (list_messages.length == 0) state.messagesLoaded = true;
+					for (const mess of list_messages) {
+						const message = {
+							_id: mess.message_id,
+							index: index,
+							content: mess.content,
+							date:
+								new Date(mess.updated_at).getDate() +
+								"/" +
+								new Date(mess.updated_at).addMonth(1).getMonth(),
+							senderId: mess.sender.user_id,
+							username: mess.sender.username,
+							timestamp:
+								new Date(mess.updated_at)
+									.addHours(7)
+									.getHours() +
+								":" +
+								new Date(mess.updated_at).getMinutes(),
+							seen: mess.seen,
+						};
+						index += 1;
+						messages.push(message);
+						if (messages.length == response.data.count) {
+							return (state.messagesLoaded = true);
+						}
+						commit("listMessages", { messages, roomId });
+						resolve(response);
+					}
+				})
+				.catch((error) => {
+					reject(error);
+					console.log(error);
+				});
+		});
+	},
+
+	sendMessages({ commit }, { content, roomId }) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "post",
+				url: "message_management/send_message",
+				data: {
+					content: content,
+					room_id: roomId,
+				},
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					const newMessage = {
+						_id: response.data.message_id,
+						content: response.data.content,
+						username: response.data.username,
+						senderId: response.data.sender_id,
+						timestamp:
+							new Date(response.data.created_at).addHours(7).getHours() +
+							":" +
+							new Date(response.data.created_at).getMinutes(),
+						seen: response.data.seen,
+						save: true,
+						new: true,
+					};
+
+					const lastMessage = {
+						content: content,
+						senderId: response.data.sender_id,
+						username: response.data.username,
+						timestamp: formatTimestamp(
+							new Date(),
+							new Date(response.data.created_at)
+						),
+						saved: true,
+						seen: response.data.seen,
+						new: true,
+					};
+
+					commit("send", { newMessage, lastMessage });
+					resolve(response);
+				})
+				.catch((error) => {
+					reject(error);
+					console.log(error);
+				});
+		});
+	},
+
+	editMessage({ commit }, { messageId, newContent }) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "put",
+				url: "messages",
+				data: {
+					message_id: messageId,
+					content: newContent,
+				},
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					commit("edit", { messageId, newContent });
+					resolve(response);
+					console.log(response.data);
+				})
+				.catch((error) => {
+					reject(error);
+					console.log(error);
+				});
+		});
+	},
+
+	deleteMessage({ commit }, message) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "delete",
+				url: "messages/" + message._id,
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					commit("delete", message);
+					resolve(response);
+				})
+				.catch((error) => {
+					reject(error);
+				});
+		});
+	},
+};
+
+const mutations = {
+	listMessages(state, { messages, roomId }) {
+		state.listMessages = messages;
+		state.idRoom = roomId;
+	},
+	send(state, { newMessage, lastMessage }) {
+		state.newMessage = newMessage;
+		state.lastMessage = lastMessage;
+	},
+	edit(state, { messageId, newContent }) {
+		state.editMessageContent = newContent;
+		state.editMessageId = messageId;
+	},
+	delete(state, message) {
+		state.deleteMessage = message;
+	},
+};
+
+export default {
+	state,
+	getters,
+	actions,
+	mutations,
+};

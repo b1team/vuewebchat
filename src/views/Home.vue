@@ -56,7 +56,6 @@
 
 <script>
 import ChatContainer from "./ChatContainer";
-import axios from "axios";
 import { mapGetters } from "vuex";
 
 export default {
@@ -64,20 +63,15 @@ export default {
 	components: {
 		ChatContainer,
 	},
-	async created() {
-		console.log(this.$store.getters.isLogin);
+	created() {
 		const token = localStorage.getItem("token");
 		if (token) {
-			await axios
-				.get("users/me", { Authorization: this.token })
-				.then((response) => {
-					this.$store.commit("user", response.data);
-					this.$store.commit('isLogin', true)
-					this.currentUserId = response.data.user_id;
-				})
-				.catch((error) => {
-					console.log(error);
-				});
+			this.$store
+				.dispatch("getUser")
+				.then(() => this.currentUserId = this.$store.getters.currentUserId)
+				.catch((error) => console.log(error) );
+		} else {
+			this.logout();
 		}
 	},
 	data() {
@@ -100,7 +94,17 @@ export default {
 		showOptions() {
 			return !this.isDevice || this.showDemoOptions;
 		},
-		...mapGetters(["user", "token", "isLogin"]),
+		...mapGetters(["user", "token"]),
+		isLogin: function() {
+			return localStorage.getItem("isLogin");
+		},
+	},
+	methods: {
+		logout: function() {
+			this.$store.dispatch("logout").then(() => {
+				this.$router.push("/login");
+			});
+		},
 	},
 
 	watch: {

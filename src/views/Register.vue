@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
 
 export default {
 	name: "Register",
@@ -129,22 +129,17 @@ export default {
 	computed: {
 		passwordMatch() {
 			return () =>
-				this.user.password === this.verify ||
-				"Password must match";
+				this.user.password === this.verify || "Password must match";
 		},
 	},
 	methods: {
-		async validate() {
+		validate: function() {
 			if (this.$refs.registerForm.validate()) {
-				await axios
-					.post("users", this.user)
-					.then((response) => {
-						console.log(response);
-						this.$router.push("/login");
-					})
-					.catch((error) => {
-						console.log(error);
-					})
+				let data = this.user;
+				this.$store
+					.dispatch("register", data)
+					.then(() => this.$router.push("/login"))
+					.catch((error) => console.log(error))
 			}
 		},
 		reset() {

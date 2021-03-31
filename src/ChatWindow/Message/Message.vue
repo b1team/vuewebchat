@@ -16,30 +16,35 @@
 			v-else
 			:id="message._id"
 			class="vac-message-box"
-			:class="{ 'vac-offset-current': message.senderId === currentUserId }"
+			:class="{
+				'vac-offset-current': message.senderId === currentUserId,
+				'vac-offset-sender': message.senderId !== currentUserId,
+			}"
 		>
 			<slot name="message" v-bind="{ message }">
 				<div
 					class="vac-message-container"
 					:class="{
-						'vac-message-container-offset': messageOffset
+						'vac-message-container-offset': messageOffset,
 					}"
 				>
 					<div
 						class="vac-message-card"
 						:class="{
 							'vac-message-highlight': isMessageHover,
-							'vac-message-current': message.senderId === currentUserId,
-							'vac-message-deleted': message.deleted
+							'vac-message-current':
+								message.senderId === currentUserId,
+							'vac-message-deleted': message.deleted,
 						}"
 						@mouseover="onHoverMessage"
 						@mouseleave="onLeaveMessage"
 					>
 						<div
-							v-if="roomUsers.length > 2 && message.senderId !== currentUserId"
+							v-if="message.senderId !== currentUserId"
 							class="vac-text-username"
 							:class="{
-								'vac-username-reply': !message.deleted && message.replyMessage
+								'vac-username-reply':
+									!message.deleted && message.replyMessage,
 							}"
 						>
 							<span>{{ message.username }}</span>
@@ -50,14 +55,20 @@
 							:message="message"
 							:room-users="roomUsers"
 						>
-							<template v-for="(i, name) in $scopedSlots" #[name]="data">
+							<template
+								v-for="(i, name) in $scopedSlots"
+								#[name]="data"
+							>
 								<slot :name="name" v-bind="data" />
 							</template>
 						</message-reply>
 
 						<div v-if="message.deleted">
 							<slot name="deleted-icon">
-								<svg-icon name="deleted" class="vac-icon-deleted" />
+								<svg-icon
+									name="deleted"
+									class="vac-icon-deleted"
+								/>
 							</slot>
 							<span>{{ textMessages.MESSAGE_DELETED }}</span>
 						</div>
@@ -69,7 +80,10 @@
 							:text-formatting="textFormatting"
 							@open-user-tag="openUserTag"
 						>
-							<template v-for="(i, name) in $scopedSlots" #[name]="data">
+							<template
+								v-for="(i, name) in $scopedSlots"
+								#[name]="data"
+							>
 								<slot :name="name" v-bind="data" />
 							</template>
 						</format-message>
@@ -83,7 +97,10 @@
 							:image-hover="imageHover"
 							@open-file="openFile"
 						>
-							<template v-for="(i, name) in $scopedSlots" #[name]="data">
+							<template
+								v-for="(i, name) in $scopedSlots"
+								#[name]="data"
+							>
 								<slot :name="name" v-bind="data" />
 							</template>
 						</message-image>
@@ -100,7 +117,10 @@
 							@update-progress-time="progressTime = $event"
 							@hover-audio-progress="hoverAudioProgress = $event"
 						>
-							<template v-for="(i, name) in $scopedSlots" #[name]="data">
+							<template
+								v-for="(i, name) in $scopedSlots"
+								#[name]="data"
+							>
 								<slot :name="name" v-bind="data" />
 							</template>
 						</audio-player>
@@ -117,7 +137,10 @@
 							<span>{{ message.content }}</span>
 						</div>
 
-						<div v-if="isAudio && !message.deleted" class="vac-progress-time">
+						<div
+							v-if="isAudio && !message.deleted"
+							class="vac-progress-time"
+						>
 							{{ progressTime }}
 						</div>
 
@@ -132,10 +155,15 @@
 							</div>
 							<span>{{ message.timestamp }}</span>
 							<span v-if="isCheckmarkVisible">
-								<slot name="checkmark-icon" v-bind="{ message }">
+								<slot
+									name="checkmark-icon"
+									v-bind="{ message }"
+								>
 									<svg-icon
 										:name="
-											message.distributed ? 'double-checkmark' : 'checkmark'
+											message.distributed
+												? 'double-checkmark'
+												: 'checkmark'
 										"
 										:param="message.seen ? 'seen' : ''"
 										class="vac-icon-check"
@@ -149,7 +177,6 @@
 							:message="message"
 							:message-actions="messageActions"
 							:room-footer-ref="roomFooterRef"
-							:show-reaction-emojis="showReactionEmojis"
 							:hide-options="hideOptions"
 							:message-hover="messageHover"
 							:hover-message-id="hoverMessageId"
@@ -159,9 +186,11 @@
 							@update-options-opened="optionsOpened = $event"
 							@update-emoji-opened="emojiOpened = $event"
 							@message-action-handler="messageActionHandler"
-							@send-message-reaction="sendMessageReaction($event)"
 						>
-							<template v-for="(i, name) in $scopedSlots" #[name]="data">
+							<template
+								v-for="(i, name) in $scopedSlots"
+								#[name]="data"
+							>
 								<slot :name="name" v-bind="data" />
 							</template>
 						</message-actions>
@@ -171,7 +200,6 @@
 						:current-user-id="currentUserId"
 						:message="message"
 						:emojis-list="emojisList"
-						@send-message-reaction="sendMessageReaction($event)"
 					/>
 				</div>
 			</slot>
@@ -180,23 +208,23 @@
 </template>
 
 <script>
-import SvgIcon from '../../components/SvgIcon'
-import FormatMessage from '../../components/FormatMessage'
+import SvgIcon from "../../components/SvgIcon";
+import FormatMessage from "../../components/FormatMessage";
 
-import MessageReply from './MessageReply'
-import MessageImage from './MessageImage'
-import MessageActions from './MessageActions'
-import MessageReactions from './MessageReactions'
-import AudioPlayer from './AudioPlayer'
+import MessageReply from "./MessageReply";
+import MessageImage from "./MessageImage";
+import MessageActions from "./MessageActions";
+import MessageReactions from "./MessageReactions";
+import AudioPlayer from "./AudioPlayer";
 
 const {
 	isImageFile,
 	isVideoFile,
-	isAudioFile
-} = require('../../utils/media-file')
+	isAudioFile,
+} = require("../../utils/media-file");
 
 export default {
-	name: 'Message',
+	name: "Message",
 	components: {
 		SvgIcon,
 		FormatMessage,
@@ -204,7 +232,7 @@ export default {
 		MessageReply,
 		MessageImage,
 		MessageActions,
-		MessageReactions
+		MessageReactions,
 	},
 
 	props: {
@@ -218,11 +246,10 @@ export default {
 		messageActions: { type: Array, required: true },
 		roomFooterRef: { type: HTMLDivElement, default: null },
 		newMessages: { type: Array, default: () => [] },
-		showReactionEmojis: { type: Boolean, required: true },
 		showNewMessagesDivider: { type: Boolean, required: true },
 		textFormatting: { type: Boolean, required: true },
 		emojisList: { type: Object, required: true },
-		hideOptions: { type: Boolean, required: true }
+		hideOptions: { type: Boolean, required: true },
 	},
 
 	data() {
@@ -233,9 +260,9 @@ export default {
 			optionsOpened: false,
 			emojiOpened: false,
 			newMessage: {},
-			progressTime: '- : -',
-			hoverAudioProgress: false
-		}
+			progressTime: "- : -",
+			hoverAudioProgress: false,
+		};
 	},
 
 	computed: {
@@ -243,88 +270,86 @@ export default {
 			return (
 				this.index > 0 &&
 				this.message.date !== this.messages[this.index - 1].date
-			)
+			);
 		},
 		messageOffset() {
 			return (
 				this.index > 0 &&
 				this.message.senderId !== this.messages[this.index - 1].senderId
-			)
+			);
 		},
 		isMessageHover() {
 			return (
 				this.editedMessage._id === this.message._id ||
 				this.hoverMessageId === this.message._id
-			)
+			);
 		},
 		isImage() {
-			return isImageFile(this.message.file)
+			return isImageFile(this.message.file);
 		},
 		isVideo() {
-			return isVideoFile(this.message.file)
+			return isVideoFile(this.message.file);
 		},
 		isAudio() {
-			return isAudioFile(this.message.file)
+			return isAudioFile(this.message.file);
 		},
 		isCheckmarkVisible() {
 			return (
 				this.message.senderId === this.currentUserId &&
 				!this.message.deleted &&
-				(this.message.saved || this.message.distributed || this.message.seen)
-			)
-		}
+				(this.message.saved ||
+					this.message.distributed ||
+					this.message.seen)
+			);
+		},
 	},
 
 	watch: {
 		newMessages(val) {
 			if (!val.length || !this.showNewMessagesDivider) {
-				return (this.newMessage = {})
+				return (this.newMessage = {});
 			}
 
 			this.newMessage = val.reduce((res, obj) =>
 				obj.index < res.index ? obj : res
-			)
-		}
+			);
+		},
 	},
 
 	methods: {
 		onHoverMessage() {
-			this.imageHover = true
-			this.messageHover = true
-			if (this.canEditMessage()) this.hoverMessageId = this.message._id
+			this.imageHover = true;
+			this.messageHover = true;
+			if (this.canEditMessage()) this.hoverMessageId = this.message._id;
 		},
 		canEditMessage() {
-			return !this.message.deleted
+			return !this.message.deleted;
 		},
 		onLeaveMessage() {
-			this.imageHover = false
-			if (!this.optionsOpened && !this.emojiOpened) this.messageHover = false
-			this.hoverMessageId = null
+			this.imageHover = false;
+			if (!this.optionsOpened && !this.emojiOpened)
+				this.messageHover = false;
+			this.hoverMessageId = null;
 		},
 		openFile(action) {
-			this.$emit('open-file', { message: this.message, action })
+			this.$emit("open-file", { message: this.message, action });
 		},
 		openUserTag(user) {
-			this.$emit('open-user-tag', { user })
+			this.$emit("open-user-tag", { user });
 		},
 		messageActionHandler(action) {
-			this.messageHover = false
-			this.hoverMessageId = null
+			this.messageHover = false;
+			this.hoverMessageId = null;
 
 			setTimeout(() => {
-				this.$emit('message-action-handler', { action, message: this.message })
-			}, 300)
+				this.$emit("message-action-handler", {
+					action,
+					message: this.message,
+				});
+			}, 300);
 		},
-		sendMessageReaction({ emoji, reaction }) {
-			this.$emit('send-message-reaction', {
-				messageId: this.message._id,
-				reaction: emoji,
-				remove: reaction && reaction.indexOf(this.currentUserId) !== -1
-			})
-			this.messageHover = false
-		}
-	}
-}
+	},
+};
 </script>
 
 <style lang="scss" scoped>
@@ -368,7 +393,7 @@ export default {
 .vac-line-new:after,
 .vac-line-new:before {
 	border-top: 1px solid var(--chat-message-color-new-messages);
-	content: '';
+	content: "";
 	left: 0;
 	position: absolute;
 	top: 50%;
@@ -401,8 +426,13 @@ export default {
 }
 
 .vac-offset-current {
+	text-align: justify;
 	margin-left: 50%;
 	justify-content: flex-end;
+}
+
+.vac-offset-sender {
+	text-align: justify;
 }
 
 .vac-message-card {
