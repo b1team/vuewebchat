@@ -63,17 +63,6 @@ export default {
 	components: {
 		ChatContainer,
 	},
-	created() {
-		const token = localStorage.getItem("token");
-		if (token) {
-			this.$store
-				.dispatch("getUser")
-				.then(() => this.currentUserId = this.$store.getters.currentUserId)
-				.catch((error) => console.log(error) );
-		} else {
-			this.logout();
-		}
-	},
 	data() {
 		return {
 			theme: "light",
@@ -89,6 +78,17 @@ export default {
 		window.addEventListener("resize", (ev) => {
 			if (ev.isTrusted) this.isDevice = window.innerWidth < 500;
 		});
+	},
+	created: function() {
+		const token = localStorage.getItem("token");
+		if (token) {
+			this.$store
+				.dispatch("getUser")
+				.then(() => (this.currentUserId = this.$store.getters.currentUserId))
+				.catch((error) => console.log(error));
+		} else {
+			this.logout();
+		}
 	},
 	computed: {
 		showOptions() {
@@ -171,10 +171,6 @@ input {
 
 select {
 	height: 20px;
-	outline: none;
-	border: 1px solid #e0e2e4;
-	border-radius: 4px;
-	background: #fff;
 	margin-bottom: 20px;
 }
 

@@ -79,7 +79,6 @@
 												custom
 												v-slot="{
 													href,
-													route,
 													navigate,
 													isActive,
 													isExactActive,
@@ -97,7 +96,7 @@
 														:href="href"
 														class="text"
 														@click="navigate"
-														>{{ route.fullPath }}</a
+														>Register </a
 													>
 												</li>
 											</router-link>
@@ -123,6 +122,8 @@ export default {
 			loginPassword: "",
 			loginUsername: "",
 		},
+		textLogin: "Dang nhap thanh cong",
+		login: false,
 
 		show1: false,
 		rules: {
@@ -137,10 +138,18 @@ export default {
 					username: this.user.loginUsername,
 					password: this.user.loginPassword,
 				};
+				const data = {
+					snackText: `Chào mừng ${this.user.loginUsername}`,
+					snackBool: true,
+				};
 				this.$store
 					.dispatch("login", user)
-					.then(() => this.$router.push("/"))
+					.then(() => {
+						this.$router.push("/");
+						this.$store.dispatch("addNoitionalData", data);
+					})
 					.catch((err) => console.log(err));
+				this.login = true;
 			}
 		},
 		reset() {

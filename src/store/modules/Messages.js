@@ -20,6 +20,7 @@ const state = {
 	editMessageContent: null,
 	editMessageId: null,
 	deleteMessage: null,
+	socketMessage: null,
 };
 
 const getters = {
@@ -31,6 +32,7 @@ const getters = {
 	editMessageContent: (state) => state.editMessageContent,
 	editMessageId: (state) => state.editMessageId,
 	deleteMessage: (state) => state.deleteMessage,
+	socketMessage: (state) => state.socketMessage,
 };
 
 const actions = {
@@ -53,18 +55,15 @@ const actions = {
 							_id: mess.message_id,
 							index: index,
 							content: mess.content,
-							date:
-								new Date(mess.updated_at).getDate() +
-								"/" +
-								new Date(mess.updated_at).addMonth(1).getMonth(),
+							date: new Date(mess.updated_at).toLocaleDateString(
+								"en-GB"
+							),
 							senderId: mess.sender.user_id,
 							username: mess.sender.username,
 							timestamp:
-								new Date(mess.updated_at)
-									.addHours(7)
-									.getHours() +
+								new Date(mess.updated_at).addHours(7).getHours() +
 								":" +
-								new Date(mess.updated_at).getMinutes(),
+								("0" + new Date(mess.updated_at).getMinutes()).slice(-2),
 							seen: mess.seen,
 						};
 						index += 1;
@@ -83,7 +82,7 @@ const actions = {
 		});
 	},
 
-	sendMessages({ commit }, { content, roomId }) {
+	sendMessages({ commit }, { content, roomId, username }) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: "post",
@@ -100,10 +99,12 @@ const actions = {
 					const newMessage = {
 						_id: response.data.message_id,
 						content: response.data.content,
-						username: response.data.username,
+						username: username,
 						senderId: response.data.sender_id,
 						timestamp:
-							new Date(response.data.created_at).addHours(7).getHours() +
+							new Date(response.data.created_at)
+								.addHours(7)
+								.getHours() +
 							":" +
 							new Date(response.data.created_at).getMinutes(),
 						seen: response.data.seen,
@@ -177,6 +178,9 @@ const actions = {
 				});
 		});
 	},
+	socketMessage({ commit }, message) {
+		commit("socketMessage", message);
+	},
 };
 
 const mutations = {
@@ -194,6 +198,9 @@ const mutations = {
 	},
 	delete(state, message) {
 		state.deleteMessage = message;
+	},
+	socketMessage(state, message) {
+		state.socketMessage = message;
 	},
 };
 

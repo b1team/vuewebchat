@@ -37,7 +37,7 @@
 			class="vac-container-scroll"
 			@scroll="onContainerScroll"
 		>
-			<loader :show="loadingMessages" />
+			<!-- <loader :show="loadingMessages" /> -->
 			<div class="vac-messages-container">
 				<div :class="{ 'vac-messages-hidden': loadingMessages }">
 					<transition name="vac-fade-message">
@@ -50,7 +50,7 @@
 							{{ textMessages.CONVERSATION_STARTED }} {{ messages[0].date }}
 						</div>
 					</transition>
-					<transition name="vac-fade-message">
+					<!-- <transition name="vac-fade-message">
 						<infinite-loading
 							v-if="messages.length"
 							:class="{ 'vac-infinite-loading': !messagesLoaded }"
@@ -65,7 +65,7 @@
 							<div slot="no-results" />
 							<div slot="no-more" />
 						</infinite-loading>
-					</transition>
+					</transition> -->
 					<transition-group :key="roomId" name="vac-fade-message">
 						<div v-for="(m, i) in messages" :key="m._id">
 							<message
@@ -316,11 +316,11 @@
 </template>
 
 <script>
-import InfiniteLoading from 'vue-infinite-loading'
+// import InfiniteLoading from 'vue-infinite-loading'
 import vClickOutside from 'v-click-outside'
 import emojis from 'vue-emoji-picker/src/emojis'
 
-import Loader from '../../components/Loader'
+// import Loader from '../../components/Loader'
 import SvgIcon from '../../components/SvgIcon'
 import EmojiPicker from '../../components/EmojiPicker'
 
@@ -339,8 +339,8 @@ const { isImageFile, isVideoFile } = require('../../utils/media-file')
 export default {
 	name: 'Room',
 	components: {
-		InfiniteLoading,
-		Loader,
+		// InfiniteLoading,
+		// Loader,
 		SvgIcon,
 		EmojiPicker,
 		RoomHeader,

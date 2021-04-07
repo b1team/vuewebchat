@@ -1,23 +1,43 @@
 <template>
 	<div id="app">
-		<div id="nav">
-			<router-link to="/" v-if="isLogin">Home |</router-link>
-			<router-link to="/login" v-if="!isLogin">Login |</router-link>
-			<router-link to="/register" v-if="!isLogin">Register |</router-link>
-			<router-link to="/profile" v-if="isLogin">Profile |</router-link>
-			<a href="javascript:void(0)" @click="logout" v-if="isLogin">
-				Logout</a
-			>
-		</div>
-		<router-view />
+		<v-app id="container">
+			<v-footer color="light-blue darken-1" padless>
+				<Header
+					@logout="logout"
+					:links="filterdLinks"
+					:isLogin="isLogin"
+				/>
+			</v-footer>
+			<router-view />
+			<notifications :text="notifications.snackText" />
+		</v-app>
 	</div>
 </template>
 
 <script lang="ts">
 import axios from "axios";
+import Notifications from "./components/Notification.vue";
+import Header from "./views/Header.vue";
+import { mapGetters } from "vuex";
+
 export default {
-	beforeDestroy() {
+	components: { Notifications, Header },
+	destroyed() {
 		this.logout();
+	},
+	data() {
+		return {
+			links: [
+				{ url: "/", name: "Home" },
+				{ url: "/profile", name: "Profile" },
+				{ url: "/login", name: "Login" },
+				{ url: "/register", name: "Register" },
+			],
+			data: {
+				snackText: "Chào mừng bạn đến với webchat B1Corp",
+				snackBool: true,
+			},
+		};
 	},
 	methods: {
 		logout: function() {
@@ -28,8 +48,22 @@ export default {
 	},
 	computed: {
 		isLogin: function() {
-			return this.$store.getters.isLogin;
+			return this.$store.getters.isLogin ? true : false;
 		},
+		filterdLinks: function() {
+			return this.isLogin
+				? this.links.slice(0, 2)
+				: this.links.slice(2, 4);
+		},
+		...mapGetters(["notifications"]),
+	},
+
+	mounted: function() {
+		window.onbeforeunload = function(e) {
+			console.log(e);
+			var storage = window.localStorage;
+			storage.clear();
+		};
 	},
 	created: function() {
 		axios.interceptors.response.use(undefined, function(err) {
@@ -39,7 +73,7 @@ export default {
 					err.config &&
 					!err.config.__isRetryRequest
 				) {
-					this.$store.dispatch('logout');
+					this.$store.dispatch("logout");
 					resolve(true);
 					this.$router.push("/login");
 				}
@@ -47,29 +81,35 @@ export default {
 				throw err;
 			});
 		});
+
+		this.$store.dispatch("addNoitionalData", this.data);
 	},
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #app {
 	font-family: Avenir, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
-	color: #2c3e50;
+	color: #8ebeee;
 }
 
-#nav {
-	padding: 30px;
+#container {
+	background-color: #1b96e7;
 	a {
 		font-weight: bold;
-		color: #2c3e50;
+		color: #000000;
 		text-decoration: none;
 
 		&.router-link-exact-active {
-			color: #42b983;
+			color: #eaf5f0;
 		}
 	}
+}
+
+.my-2 {
+	min-height: 0;
 }
 </style>

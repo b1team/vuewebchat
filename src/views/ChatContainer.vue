@@ -90,7 +90,7 @@ export default {
 			list_rooms: [],
 			roomId: "",
 			roomsLoaded: false,
-			loadingRooms: true,
+			loadingRooms: false,
 			selectedRoom: null,
 			messagesPerPage: 10,
 			messages: [],
@@ -117,13 +117,18 @@ export default {
 				{ name: "deleteRoom", title: "Delete Room" },
 			],
 			styles: { container: { borderRadius: "4px" } },
+			connection: null,
+			snackBool: false,
+			snackText: "",
 		};
 	},
 
 	mounted() {
 		try {
 			this.fetchRooms();
-			this.updateUserOnlineStatus();
+			this.snackText = "Dang nhap thanh cong";
+			this.snackBool = true;
+			// this.updateUserOnlineStatus();
 		} catch (error) {
 			console.log("listener is not error");
 		}
@@ -152,8 +157,10 @@ export default {
 			"newMessage",
 		]),
 	},
-	async created() {
-		await this.fetchMoreRooms();
+	created: function() {
+		this.fetchMoreRooms();
+		this.socketSend();
+		//socket
 	},
 
 	methods: {
@@ -178,6 +185,13 @@ export default {
 			this.fetchMoreRooms();
 		},
 
+		message_is_exist: function(message) {
+			var message_id = message.id;
+			for (const message of this.messages)
+				if (message_id === message._id) return true;
+			return false;
+		},
+
 		async fetchMoreRooms() {
 			await this.$store
 				.dispatch("fetchAllRooms")
@@ -190,16 +204,17 @@ export default {
 
 			this.selectedRoom = room.roomId;
 			await this.$store
-				.dispatch("fetchRoomMessage", room.roomId)
+				.dispatch("fetchRoomMessage", this.selectedRoom)
 				.then(() => (this.messages = this.listMessages));
-			this.messagesLoaded = this.$store.getters.messagesLoaded;
+			this.messagesLoaded = false;
 		},
 
 		async sendMessage({ content, roomId }) {
+			const username = this.user.username;
 			await this.$store
-				.dispatch("sendMessages", { content, roomId })
+				.dispatch("sendMessages", { content, roomId, username })
 				.then(() => {
-					this.messages = this.messages.concat(this.newMessage);
+					this.connection.send(JSON.stringify(this.newMessage));
 
 					for (const room of this.list_rooms) {
 						if (room.roomId === roomId) {
@@ -208,6 +223,52 @@ export default {
 					}
 				})
 				.catch((error) => console.error(error));
+		},
+
+		socketSend: function() {
+			this.connection = new WebSocket(
+				`${process.env.VUE_APP_CHAT_WS}?token=` + this.token
+			);
+
+			this.connection.vue = this;
+			this.connection.onmessage = function(event) {
+				//push message
+				event.preventDefault();
+				var data = JSON.parse(event.data);
+				var message = data.payload;
+				if (this.vue.message_is_exist(message)) {
+					return;
+				}
+				message["_id"] = message["message_id"];
+				message["senderId"] = message["sender_id"];
+				message["timestamp"] =
+					new Date(message.created_at).addHours(7).getHours() +
+					":" +
+					new Date(message.created_at).getMinutes();
+				this.vue.messages.push(message);
+				// notification new message
+				if (this.vue.currentUserId !== message["senderId"]) {
+					this.vue.sendNotification({
+						title: "Thong bao tu B1Corp webchat",
+						message:message["username"] +": "+ message["content"],
+						icon:
+							"https://cdn2.iconfinder.com/data/icons/mixed-rounded-flat-icon/512/megaphone-64.png",
+						clickCallback: function() {
+							alert("do something when clicked on notification");
+						},
+					});
+				}
+			};
+
+			this.connection.onerror = function(event) {
+				console.log(event);
+				alert("Connection Error");
+			};
+
+			this.connection.onopen = function(event) {
+				event.preventDefault();
+				console.log(event.data);
+			};
 		},
 
 		openFile({ message }) {
@@ -299,11 +360,13 @@ export default {
 			await this.$store
 				.dispatch("createRoom", this.addRoomUsername)
 				.then(() => {
-					this.addNewRoom = false;
-					this.addRoomUsername = "";
-					this.fetchRooms();
+					console.log("tao room");
 				})
 				.catch((err) => console.error(err));
+
+			this.addNewRoom = false;
+			this.addRoomUsername = "";
+			this.fetchMoreRooms();
 		},
 
 		inviteUser(roomId) {
@@ -314,15 +377,21 @@ export default {
 		async addRoomUser() {
 			this.disableForm = true;
 			const memberName = this.invitedUsername;
+			const data = {
+				snackText: `Mời thành công ${memberName}`,
+				snackBool: true,
+			};
 			const roomId = this.inviteRoomId;
 			await this.$store
 				.dispatch("addUser", { roomId, memberName })
 				.then(() => {
-					this.inviteRoomId = null;
-					this.invitedUsername = "";
-					this.fetchRooms();
+					this.$store.dispatch("addNoitionalData", data);
 				})
 				.catch((err) => console.log(err));
+
+			this.inviteRoomId = null;
+			this.invitedUsername = "";
+			this.fetchMoreRooms();
 		},
 
 		removeUser(roomId) {
@@ -337,24 +406,35 @@ export default {
 			this.disableForm = true;
 			const roomId = this.removeRoomId;
 			const userName = this.removeUserName;
+			const data = {
+				snackText: `Đã đuổi ${userName} ra khỏi phòng`,
+				snackBool: true,
+			};
 			await this.$store
 				.dispatch("removeUser", { roomId, userName })
 				.then(() => {
-					this.removeRoomId = null;
-					this.removeUserName = "";
-					this.fetchRooms();
+					this.$store.dispatch("addNoitionalData", data);
 				})
 				.catch((err) => console.log(err));
+
+			this.removeRoomId = null;
+			this.removeUserName = "";
+			this.fetchMoreRooms();
 		},
 
 		async deleteRoom(roomId) {
+			const data = {
+				snackText: `Đã xóa phòng`,
+				snackBool: true,
+			};
 			await this.$store
-				.dispatch("removeRoom", { roomId })
+				.dispatch("removeRoom", roomId)
 				.then(() => {
-					this.fetchRooms();
-					alert("delete success");
+					this.$store.dispatch("addNoitionalData", data);
 				})
 				.catch((err) => console.log(err));
+
+			this.fetchMoreRooms();
 		},
 
 		resetForms() {
@@ -365,6 +445,45 @@ export default {
 			this.invitedUsername = "";
 			this.removeRoomId = null;
 			this.removeUserName = "";
+		},
+
+		sendNotification: function(data) {
+			if (data == undefined || !data) {
+				return false;
+			}
+			var title = data.title === undefined ? "Notification" : data.title;
+			var clickCallback = data.clickCallback;
+			var message = data.message === undefined ? "null" : data.message;
+			var icon =
+				data.icon === undefined
+					? "https://cdn2.iconfinder.com/data/icons/mixed-rounded-flat-icon/512/megaphone-64.png"
+					: data.icon;
+			var sendNotification = function() {
+				var notification = new Notification(title, {
+					icon: icon,
+					body: message,
+				});
+				if (clickCallback !== undefined) {
+					notification.onclick = function() {
+						clickCallback();
+						notification.close();
+					};
+				}
+			};
+
+			if (!window.Notification) {
+				return false;
+			} else {
+				if (Notification.permission === "default") {
+					Notification.requestPermission(function(p) {
+						if (p !== "denied") {
+							sendNotification();
+						}
+					});
+				} else {
+					sendNotification();
+				}
+			}
 		},
 	},
 };

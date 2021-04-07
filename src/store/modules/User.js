@@ -63,7 +63,7 @@ const actions = {
 		return new Promise((resolve) => {
 			commit("logout");
 			delete axios.defaults.headers.common["Authorization"];
-			resolve();
+			resolve(true);
 		});
 	},
 

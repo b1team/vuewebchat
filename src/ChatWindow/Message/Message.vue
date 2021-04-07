@@ -268,7 +268,7 @@ export default {
 	computed: {
 		showDate() {
 			return (
-				this.index > 0 &&
+				this.index > 0 && this.message.date &&
 				this.message.date !== this.messages[this.index - 1].date
 			);
 		},

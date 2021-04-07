@@ -1,3 +1,8 @@
+Date.prototype.addHours = function(h) {
+	this.setHours(this.getHours() + h);
+	return this;
+};
+
 export const parseTimestamp = (timestamp, format = "") => {
 	if (!timestamp) return;
 
@@ -6,7 +11,7 @@ export const parseTimestamp = (timestamp, format = "") => {
 		: timestamp;
 
 	if (format === "HH:mm") {
-		return `${zeroPad(date.getHours() + 7, 2)}:${zeroPad(
+		return `${zeroPad(date.addHours(7).getHours(), 2)}:${zeroPad(
 			date.getMinutes(),
 			2
 		)}`;

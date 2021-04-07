@@ -100,8 +100,6 @@
 </template>
 
 <script>
-// import axios from "axios";
-
 export default {
 	name: "Register",
 	data() {
@@ -136,10 +134,17 @@ export default {
 		validate: function() {
 			if (this.$refs.registerForm.validate()) {
 				let data = this.user;
+				const info = {
+					snackText: "Đăng ký thành công",
+					snackBool: true,
+				};
 				this.$store
 					.dispatch("register", data)
-					.then(() => this.$router.push("/login"))
-					.catch((error) => console.log(error))
+					.then(() => {
+						this.$router.push("/login");
+						this.$store.dispatch("addNoitionalData", info);
+					})
+					.catch((error) => console.log(error));
 			}
 		},
 		reset() {

@@ -1,8 +1,8 @@
-import { formatTimestamp } from "../../utils/dates";
 import axios from "axios";
 
 const state = {
 	rooms: null,
+	success: false,
 };
 
 const getters = {
@@ -28,20 +28,27 @@ const actions = {
 							roomName: room.room_name,
 							avatar: room.avatar,
 							unreadCount: room.unreadCount,
-							lastMessage: {
+							users: [],
+						};
+
+						if (Object.keys(room.last_message).length !== 0) {
+							const lastMessage = {
 								content: room.last_message.content,
 								senderId: room.last_message.sender_id,
 								username: room.last_message.username,
-								timestamp: formatTimestamp(
-									new Date(room.last_message.timestamp),
-									new Date(room.last_message.timestamp)
-								),
+								timestamp: new Date(
+									room.last_message.timestamp
+								).toLocaleDateString("en-GB"),
+
 								saved: true,
 								seen: room.last_message.seen,
 								new: true,
-							},
-							users: [],
-						};
+							};
+
+							room_format["lastMessage"] = lastMessage;
+						} else {
+							room_format["lastMessage"] = { content: "" };
+						}
 						list_rooms.push(room_format);
 					}
 					commit("rooms", list_rooms);
@@ -64,7 +71,7 @@ const actions = {
 				},
 			})
 				.then((response) => {
-					commit();
+					commit("success");
 					resolve(response);
 					console.log(response);
 				})
@@ -89,7 +96,7 @@ const actions = {
 				},
 			})
 				.then((response) => {
-					commit();
+					commit("success");
 					resolve(response);
 				})
 				.catch((error) => {
@@ -112,7 +119,7 @@ const actions = {
 				},
 			})
 				.then((response) => {
-					commit();
+					commit("success");
 					resolve(response);
 				})
 				.catch((error) => {
@@ -131,7 +138,7 @@ const actions = {
 				},
 			})
 				.then((response) => {
-					commit();
+					commit("success");
 					resolve(response);
 				})
 				.catch((error) => {
@@ -144,6 +151,9 @@ const actions = {
 const mutations = {
 	rooms(state, rooms) {
 		state.rooms = rooms;
+	},
+	success(state) {
+		state.success = true;
 	},
 };
 
