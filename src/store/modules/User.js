@@ -48,12 +48,11 @@ const actions = {
 				data: user,
 			})
 				.then((response) => {
-					console.log(response);
 					commit("register_success");
 					resolve(response);
 				})
 				.catch((error) => {
-					console.log(error);
+					console.log("CREATE USER ERROR: ", error);
 					reject(error);
 				});
 		});
@@ -81,7 +80,7 @@ const actions = {
 					resolve(response);
 				})
 				.catch((error) => {
-					console.log(error);
+					console.log("GET USER ERROR: ", error);
 					reject(error);
 				});
 		});

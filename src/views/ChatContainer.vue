@@ -96,8 +96,6 @@ export default {
 			messages: [],
 			messagesLoaded: false,
 			roomMessage: "",
-			roomsListeners: [1],
-			listeners: [],
 			disableForm: false,
 			addNewRoom: null,
 			addRoomUsername: "",
@@ -130,7 +128,7 @@ export default {
 			this.snackBool = true;
 			// this.updateUserOnlineStatus();
 		} catch (error) {
-			console.log("listener is not error");
+			return;
 		}
 	},
 
@@ -138,7 +136,7 @@ export default {
 		try {
 			this.resetRooms();
 		} catch (error) {
-			console.log("listener is not error");
+			return;
 		}
 	},
 
@@ -168,16 +166,12 @@ export default {
 			this.loadingRooms = true;
 			this.list_rooms = [];
 			this.roomsLoaded = true;
-			this.roomsListeners.forEach((listener) => listener());
-			this.roomsListeners = [];
 			this.resetMessages();
 		},
 
 		resetMessages() {
 			this.messages = [];
 			this.messagesLoaded = false;
-			this.listeners.forEach((listener) => listener());
-			this.listeners = [];
 		},
 
 		fetchRooms() {
@@ -260,14 +254,14 @@ export default {
 				}
 			};
 
+			// eslint-disable-next-line no-unused-vars
 			this.connection.onerror = function(event) {
-				console.log(event);
 				alert("Connection Error");
 			};
 
 			this.connection.onopen = function(event) {
 				event.preventDefault();
-				console.log(event.data);
+				console.log("Connected");
 			};
 		},
 
@@ -359,9 +353,6 @@ export default {
 
 			await this.$store
 				.dispatch("createRoom", this.addRoomUsername)
-				.then(() => {
-					console.log("tao room");
-				})
 				.catch((err) => console.error(err));
 
 			this.addNewRoom = false;
@@ -385,7 +376,7 @@ export default {
 			await this.$store
 				.dispatch("addUser", { roomId, memberName })
 				.then(() => {
-					this.$store.dispatch("addNoitionalData", data);
+					this.$store.dispatch("addNotification", data);
 				})
 				.catch((err) => console.log(err));
 
@@ -413,7 +404,7 @@ export default {
 			await this.$store
 				.dispatch("removeUser", { roomId, userName })
 				.then(() => {
-					this.$store.dispatch("addNoitionalData", data);
+					this.$store.dispatch("addNotification", data);
 				})
 				.catch((err) => console.log(err));
 
@@ -430,7 +421,7 @@ export default {
 			await this.$store
 				.dispatch("removeRoom", roomId)
 				.then(() => {
-					this.$store.dispatch("addNoitionalData", data);
+					this.$store.dispatch("addNotification", data);
 				})
 				.catch((err) => console.log(err));
 

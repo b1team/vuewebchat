@@ -363,8 +363,8 @@ export default {
 	overflow-wrap: break-word;
 	position: relative;
 	white-space: normal;
-	box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.1),
-		0 1px 1px -1px rgba(0, 0, 0, 0.11), 0 1px 2px -1px rgba(0, 0, 0, 0.11);
+	// box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.1),
+	// 	0 1px 1px -1px rgba(0, 0, 0, 0.11), 0 1px 2px -1px rgba(0, 0, 0, 0.11);
 }
 
 .vac-card-date {

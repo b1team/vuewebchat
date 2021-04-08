@@ -26,7 +26,7 @@ export default {
 
 <style lang="scss" scoped>
 #header {
-	background-color: #1b96e7;
+	// background-color: #1b96e7;
 	a {
 		font-weight: bold;
 		color: #000000;

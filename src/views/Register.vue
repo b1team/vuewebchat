@@ -142,7 +142,7 @@ export default {
 					.dispatch("register", data)
 					.then(() => {
 						this.$router.push("/login");
-						this.$store.dispatch("addNoitionalData", info);
+						this.$store.dispatch("addNotification", info);
 					})
 					.catch((error) => console.log(error));
 			}

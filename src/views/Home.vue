@@ -25,12 +25,12 @@
 			</select>
 
 			<div class="button-theme" v-if="showOptions">
-				<button @click="theme = 'light'" class="button-light">
+				<!-- <button @click="theme = 'light'" class="button-light">
 					Light
-				</button>
-				<button @click="theme = 'dark'" class="button-dark">
+				</button> -->
+				<!-- <button @click="theme = 'dark'" class="button-dark">
 					Dark
-				</button>
+				</button> -->
 				<button class="button-github" title="Link to fontend">
 					<a href="https://github.com/b1team/vuewebchat">
 						<img src="@/assets/github.svg" />

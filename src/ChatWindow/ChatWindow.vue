@@ -46,8 +46,6 @@
 				:text-formatting="textFormatting"
 				:is-mobile="isMobile"
 				:loading-rooms="loadingRooms"
-				:room-info="$listeners.roomInfo"
-				:textarea-action="$listeners.textareaActionHandler"
 				:accepted-files="acceptedFiles"
 				@toggle-rooms-list="toggleRoomsList"
 				@room-info="roomInfo"

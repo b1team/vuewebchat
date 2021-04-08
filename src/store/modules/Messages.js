@@ -77,7 +77,7 @@ const actions = {
 				})
 				.catch((error) => {
 					reject(error);
-					console.log(error);
+					console.log("LIST MESSAGE ERROR:", error);
 				});
 		});
 	},
@@ -96,6 +96,9 @@ const actions = {
 				},
 			})
 				.then((response) => {
+					if(!response.data){
+						return;
+					}
 					const newMessage = {
 						_id: response.data.message_id,
 						content: response.data.content,
@@ -130,7 +133,7 @@ const actions = {
 				})
 				.catch((error) => {
 					reject(error);
-					console.log(error);
+					console.log("SEND MESSAGE ERROR: ", error);
 				});
 		});
 	},
@@ -151,11 +154,10 @@ const actions = {
 				.then((response) => {
 					commit("edit", { messageId, newContent });
 					resolve(response);
-					console.log(response.data);
 				})
 				.catch((error) => {
 					reject(error);
-					console.log(error);
+					console.log("EDIT MESSAGE ERROR: ", error);
 				});
 		});
 	},

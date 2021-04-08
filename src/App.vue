@@ -1,7 +1,7 @@
 <template>
 	<div id="app">
 		<v-app id="container">
-			<v-footer color="light-blue darken-1" padless>
+			<v-footer color="blue-grey lighten-1" padless>
 				<Header
 					@logout="logout"
 					:links="filterdLinks"
@@ -22,9 +22,9 @@ import { mapGetters } from "vuex";
 
 export default {
 	components: { Notifications, Header },
-	destroyed() {
-		this.logout();
-	},
+	// destroyed() {
+	// 	this.logout();
+	// },
 	data() {
 		return {
 			links: [
@@ -59,30 +59,32 @@ export default {
 	},
 
 	mounted: function() {
-		window.onbeforeunload = function(e) {
-			console.log(e);
-			var storage = window.localStorage;
-			storage.clear();
-		};
+		// window.onbeforeunload = function(e) {
+		// 	console.log(e);
+		// 	var storage = window.localStorage;
+		// 	storage.clear();
+		// };
 	},
 	created: function() {
-		axios.interceptors.response.use(undefined, function(err) {
-			return new Promise(function(resolve, reject) {
-				if (
-					err.status === 401 &&
-					err.config &&
-					!err.config.__isRetryRequest
-				) {
+		axios.interceptors.response.use(
+			(response) => {
+				return response;
+			},
+			(error) => {
+				if (error.response.status === 401) {
+					var data = {
+						snackText: "Phiên đăng nhập hết hạn",
+						snackBool: true,
+					}
+					this.$store.dispatch("addNotification", data);
 					this.$store.dispatch("logout");
-					resolve(true);
 					this.$router.push("/login");
 				}
-				reject(err);
-				throw err;
-			});
-		});
+				return error;
+			}
+		);
 
-		this.$store.dispatch("addNoitionalData", this.data);
+		this.$store.dispatch("addNotification", this.data);
 	},
 };
 </script>
@@ -97,7 +99,7 @@ export default {
 }
 
 #container {
-	background-color: #1b96e7;
+	background-color: #f4f4f5;
 	a {
 		font-weight: bold;
 		color: #000000;

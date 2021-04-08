@@ -146,7 +146,7 @@ export default {
 					.dispatch("login", user)
 					.then(() => {
 						this.$router.push("/");
-						this.$store.dispatch("addNoitionalData", data);
+						this.$store.dispatch("addNotification", data);
 					})
 					.catch((err) => console.log(err));
 				this.login = true;

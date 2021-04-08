@@ -7,13 +7,13 @@ const getters = {
 };
 
 const actions = {
-    addNoitionalData({commit}, data) {
-        commit("pushNoitionalData", data);
+    addNotification({commit}, data) {
+        commit("pushNotification", data)
     }
 };
 
 const mutations = {
-    pushNoitionalData(state, data) {
+    pushNotification(state, data) {
         state.notifications = data;
     }
 };

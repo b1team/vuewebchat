@@ -73,11 +73,10 @@ const actions = {
 				.then((response) => {
 					commit("success");
 					resolve(response);
-					console.log(response);
 				})
 				.catch((error) => {
 					reject(error);
-					console.log(error);
+					console.log("CREATE ROOM ERROR: ", error);
 				});
 		});
 	},

@@ -3,10 +3,11 @@
 		<div class="text-center">
 			<v-snackbar
 				v-model="notifications.snackBool"
-				:top="top"
-				rounded="pill"
+				:bottom="bool"
+				:right="bool"
 				color="blue-grey"
 				:timeout="timeout"
+				class="text-center"
 			>
 				{{ text }}
 			</v-snackbar>
@@ -23,9 +24,16 @@ export default {
 	data() {
 		return {
 			timeout: 2000,
-			top: true,
+			bool: true,
 			snackbar: true,
 		};
 	},
 };
 </script>
+
+<style scoped>
+.text-center {
+	text-align: center;
+	align-content: center;
+}
+</style>
