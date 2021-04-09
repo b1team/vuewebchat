@@ -17,6 +17,7 @@ const state = {
 	lastMessage: null,
 	newMessage: null,
 	idRoom: null,
+	roomInfo: null,
 	editMessageContent: null,
 	editMessageId: null,
 	deleteMessage: null,
@@ -33,10 +34,11 @@ const getters = {
 	editMessageId: (state) => state.editMessageId,
 	deleteMessage: (state) => state.deleteMessage,
 	socketMessage: (state) => state.socketMessage,
+	roomInfo: (state) => state.roomInfo
 };
 
 const actions = {
-	fetchRoomMessage({ commit }, roomId) {
+	fetchRoomMessage({ commit }, {roomId, roomInfo}) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: "get",
@@ -71,9 +73,11 @@ const actions = {
 						if (messages.length == response.data.count) {
 							return (state.messagesLoaded = true);
 						}
-						commit("listMessages", { messages, roomId });
+						commit("listMessages", { messages, roomId, roomInfo });
 						resolve(response);
+
 					}
+					console.log("roomInfo", roomInfo);
 				})
 				.catch((error) => {
 					reject(error);
@@ -186,9 +190,10 @@ const actions = {
 };
 
 const mutations = {
-	listMessages(state, { messages, roomId }) {
+	listMessages(state, { messages, roomId, roomInfo }) {
 		state.listMessages = messages;
 		state.idRoom = roomId;
+		state.roomInfo = roomInfo;
 	},
 	send(state, { newMessage, lastMessage }) {
 		state.newMessage = newMessage;

@@ -1,63 +1,61 @@
 <template>
-	<div id="app">
-		<v-app id="inspire">
-			<v-row justify="center">
-				<v-dialog v-model="dialog" persistent max-width="600px">
-					<v-card>
-						<v-card-text>
-							<v-container>
-								<v-row>
-									<v-col cols="12" sm="6" md="4">
-										<v-avatar size="150">
-											<v-img
-												max-height="250"
-												max-width="350"
-												:src="avatar_url"
-											></v-img>
-										</v-avatar>
-									</v-col>
-									<v-col cols="12" sm="6" md="4">
-										<h2>{{ user.username }} Profile</h2>
-										id: {{ user.user_id }}
-									</v-col>
-									<v-col cols="12">
-										<v-text-field
-											label="Username"
-											v-model="username"
-											required
-										></v-text-field>
-									</v-col>
-									<v-col cols="12">
-										<v-text-field
-											label="Name"
-											v-model="name"
-											required
-										></v-text-field>
-									</v-col>
-									<v-col cols="12">
-										<v-text-field
-											label="Avatar url"
-											v-model="avatar_url"
-											required
-										></v-text-field>
-									</v-col>
-								</v-row>
-							</v-container>
-						</v-card-text>
-						<v-card-actions>
-							<v-spacer></v-spacer>
-							<v-btn color="blue darken-1" text @click="close">
-								Close
-							</v-btn>
-							<v-btn color="blue darken-1" text @click="save">
-								Save
-							</v-btn>
-						</v-card-actions>
-					</v-card>
-				</v-dialog>
-			</v-row>
-		</v-app>
-	</div>
+	<v-app id="inspire">
+		<v-row justify="center">
+			<v-dialog v-model="dialog" persistent max-width="600px">
+				<v-card>
+					<v-card-text>
+						<v-container>
+							<v-row>
+								<v-col cols="12" sm="6" md="4">
+									<v-avatar size="150">
+										<v-img
+											max-height="250"
+											max-width="350"
+											:src="avatar_url"
+										></v-img>
+									</v-avatar>
+								</v-col>
+								<v-col cols="12" sm="6" md="4">
+									<h2>{{ user.username }} Profile</h2>
+									id: {{ user.user_id }}
+								</v-col>
+								<v-col cols="12">
+									<v-text-field
+										label="Username"
+										v-model="username"
+										required
+									></v-text-field>
+								</v-col>
+								<v-col cols="12">
+									<v-text-field
+										label="Name"
+										v-model="name"
+										required
+									></v-text-field>
+								</v-col>
+								<v-col cols="12">
+									<v-text-field
+										label="Avatar url"
+										v-model="avatar_url"
+										required
+									></v-text-field>
+								</v-col>
+							</v-row>
+						</v-container>
+					</v-card-text>
+					<v-card-actions>
+						<v-spacer></v-spacer>
+						<v-btn color="blue darken-1" text @click="close">
+							Close
+						</v-btn>
+						<v-btn color="blue darken-1" text @click="save">
+							Save
+						</v-btn>
+					</v-card-actions>
+				</v-card>
+			</v-dialog>
+		</v-row>
+	</v-app>
 </template>
 
 <script>
@@ -102,5 +100,3 @@ export default {
 	},
 };
 </script>
-
-<style></style>

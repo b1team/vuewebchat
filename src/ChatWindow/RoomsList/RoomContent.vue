@@ -6,6 +6,11 @@
 				class="vac-room-avatar"
 				:style="{ 'background-image': `url('${room.avatar}')` }"
 			/>
+			<div v-else class="vac-room-avatar">
+				<v-avatar color="blue" size="40">
+					<span class="white--text headline">{{textAvatar}}</span>
+				</v-avatar>
+			</div>
 			<div class="vac-name-container vac-text-ellipsis">
 				<div class="vac-title-container">
 					<div
@@ -204,7 +209,16 @@ export default {
 		},
 		isAudio() {
 			return isAudioFile(this.room.lastMessage.file)
-		}
+		},
+		textAvatar() {
+			var roomName = this.room.roomName;
+			var words = roomName.split(" ");
+			if (words.length === 1) {
+				return (words[0][0].toUpperCase());
+			} else {
+				return ((words[0][0] + words[words.length - 1][0]).toUpperCase());
+			}
+		},
 	},
 
 	methods: {

@@ -1,6 +1,14 @@
 <template>
 	<div class="vac-card-window" :style="[{ height }, cssVars]">
 		<div class="vac-chat-container">
+			<Header
+				@logout="logout"
+				:links="filterdLinks"
+				:user="user"
+				:iconDetails="iconDetails"
+				:iconLogout="iconLogout"
+			/>
+
 			<rooms-list
 				v-if="!singleRoom"
 				:current-user-id="currentUserId"
@@ -69,6 +77,9 @@
 <script>
 import RoomsList from "./RoomsList/RoomsList";
 import Room from "./Room/Room";
+import Header from "@/views/Header";
+import { mdiMicrosoftXboxControllerMenu, mdiLogout } from "@mdi/js";
+import { mapGetters } from "vuex";
 
 import locales from "../locales";
 import { defaultThemeStyles, cssThemeVars } from "../themes";
@@ -79,10 +90,11 @@ export default {
 	components: {
 		RoomsList,
 		Room,
+		Header,
 	},
 
 	props: {
-		height: { type: String, default: "600px" },
+		height: { type: String, default: "600" },
 		theme: { type: String, default: "light" },
 		styles: { type: Object, default: () => ({}) },
 		responsiveBreakpoint: { type: Number, default: 900 },
@@ -119,6 +131,7 @@ export default {
 		newMessage: { type: Object, default: null },
 		roomMessage: { type: String, default: "" },
 		acceptedFiles: { type: String, default: "*" },
+		filterdLinks: { type: Array, default: () => [] },
 	},
 
 	data() {
@@ -127,6 +140,8 @@ export default {
 			loadingMoreRooms: false,
 			showRoomsList: true,
 			isMobile: false,
+			iconDetails: mdiMicrosoftXboxControllerMenu,
+			iconLogout: mdiLogout,
 		};
 	},
 
@@ -158,6 +173,7 @@ export default {
 				return aVal > bVal ? -1 : bVal > aVal ? 1 : 0;
 			});
 		},
+		...mapGetters(["user"]),
 	},
 
 	watch: {
@@ -307,6 +323,11 @@ export default {
 				roomId: this.room.roomId,
 			});
 		},
+		logout: function() {
+			this.$store.dispatch("logout").then(() => {
+				this.$router.push("/login");
+			});
+		},
 	},
 };
 </script>
@@ -324,7 +345,6 @@ export default {
 	position: relative;
 	white-space: normal;
 	border: var(--chat-container-border);
-	border-radius: var(--chat-container-border-radius);
 	box-shadow: var(--chat-container-box-shadow);
 	-webkit-tap-highlight-color: transparent;
 

@@ -27,7 +27,7 @@ const actions = {
 							roomId: room.id,
 							roomName: room.room_name,
 							avatar: room.avatar,
-							unreadCount: room.unreadCount,
+							// unreadCount: room.unreadCount,
 							users: [],
 						};
 
@@ -132,6 +132,30 @@ const actions = {
 			axios({
 				method: "delete",
 				url: "rooms?room_id=" + roomId,
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					commit("success");
+					resolve(response);
+				})
+				.catch((error) => {
+					reject(error);
+				});
+		});
+	},
+
+	updateRoom({ commit }, data) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "put",
+				url: "rooms/update",
+				data: {
+					room_id: data.room_id,
+					room_name: data.room_name,
+					avatar: data.avatar
+				},
 				headers: {
 					Authorization: "Bearer " + localStorage.getItem("token"),
 				},

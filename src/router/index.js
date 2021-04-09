@@ -4,6 +4,7 @@ import Home from "../views/Home.vue";
 import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Profile from "../views/Profile.vue";
+import Header from "../views/Header.vue";
 // import store from "../store"
 
 Vue.use(VueRouter);
@@ -60,6 +61,11 @@ const routes = [
 		meta: {
 			title: "Profile",
 		},
+	},
+	{
+		path: "/header",
+		name: "Header",
+		component: Header,
 	},
 ];
 

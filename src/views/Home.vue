@@ -1,62 +1,27 @@
 <template>
-	<div>
-		<div
-			class="app-container"
-			:class="{
-				'app-mobile': isDevice,
-				'app-mobile-dark': theme === 'dark',
-			}"
-		>
-			<span
-				class="user-logged"
-				:class="{ 'user-logged-dark': theme === 'dark' }"
-				v-if="showOptions"
-			>
-				Logged as
-			</span>
-			<select v-model="currentUserId" v-if="showOptions">
-				<option
-					:key="user.user_id"
-					:value="user.user_id"
-					v-if="isLogin"
-				>
-					{{ user.username }}
-				</option>
-			</select>
-
-			<div class="button-theme" v-if="showOptions">
-				<!-- <button @click="theme = 'light'" class="button-light">
-					Light
-				</button> -->
-				<!-- <button @click="theme = 'dark'" class="button-dark">
-					Dark
-				</button> -->
-				<button class="button-github" title="Link to fontend">
-					<a href="https://github.com/b1team/vuewebchat">
-						<img src="@/assets/github.svg" />
-					</a>
-				</button>
-				<button class="button-github" title="Link to backend">
-					<a href="https://github.com/b1team/trada">
-						<img src="@/assets/github.svg" />
-					</a>
-				</button>
-			</div>
-
-			<chat-container
-				:currentUserId="currentUserId"
-				:theme="theme"
-				:isDevice="isDevice"
-				@show-demo-options="showDemoOptions = $event"
-				v-if="showChat"
-			/>
-		</div>
+	<div
+		class="app-container"
+		:class="{
+			'app-mobile': isDevice,
+			'app-mobile-dark': theme === 'dark',
+		}"
+	>
+		<chat-container
+			:currentUserId="currentUserId"
+			:theme="theme"
+			:isDevice="isDevice"
+			:filterdLinks="filterdLinks"
+			@show-demo-options="showDemoOptions = $event"
+			v-if="showChat"
+		/>
 	</div>
 </template>
 
 <script>
 import ChatContainer from "./ChatContainer";
 import { mapGetters } from "vuex";
+import { mdiAccount } from "@mdi/js";
+import { mdiHomeAccount, mdiAccountDetails } from "@mdi/js";
 
 export default {
 	name: "Home",
@@ -71,6 +36,13 @@ export default {
 			isDevice: false,
 			showDemoOptions: true,
 			updatingData: false,
+			icons: { mdiAccount },
+			links: [
+				{ url: "/", name: "Home", icon: mdiHomeAccount },
+				{ url: "/profile", name: "Profile", icon: mdiAccountDetails },
+				{ url: "/login", name: "Login" },
+				{ url: "/register", name: "Register" },
+			],
 		};
 	},
 	mounted() {
@@ -84,7 +56,10 @@ export default {
 		if (token) {
 			this.$store
 				.dispatch("getUser")
-				.then(() => (this.currentUserId = this.$store.getters.currentUserId))
+				.then(
+					() =>
+						(this.currentUserId = this.$store.getters.currentUserId)
+				)
 				.catch((error) => console.log(error));
 		} else {
 			this.logout();
@@ -96,7 +71,12 @@ export default {
 		},
 		...mapGetters(["user", "token"]),
 		isLogin: function() {
-			return localStorage.getItem("isLogin");
+			return this.$store.getters.isLogin ? true : false;
+		},
+		filterdLinks: function() {
+			return this.isLogin
+				? this.links.slice(0, 2)
+				: this.links.slice(2, 4);
 		},
 	},
 	methods: {
@@ -128,7 +108,7 @@ input {
 
 .app-container {
 	font-family: "Quicksand", sans-serif;
-	padding: 20px 30px 30px;
+	// padding: 20px 30px 30px;
 }
 
 .app-mobile {
@@ -170,7 +150,6 @@ input {
 }
 
 select {
-	height: 20px;
 	margin-bottom: 20px;
 }
 

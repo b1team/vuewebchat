@@ -176,8 +176,8 @@ export default {
 	position: relative;
 	background: var(--chat-sidemenu-bg-color);
 	height: 100%;
-	border-top-left-radius: var(--chat-container-border-radius);
-	border-bottom-left-radius: var(--chat-container-border-radius);
+	// border-top-left-radius: var(--chat-container-border-radius);
+	// border-bottom-left-radius: var(--chat-container-border-radius);
 }
 
 .vac-rooms-container-full {

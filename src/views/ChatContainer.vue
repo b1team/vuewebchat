@@ -1,18 +1,27 @@
 <template>
 	<div class="window-container" :class="{ 'window-mobile': isDevice }">
-		<form @submit.prevent="createRoom" v-if="addNewRoom">
-			<input
-				type="text"
-				placeholder="Add username"
-				v-model="addRoomUsername"
-			/>
-			<button type="submit" :disabled="disableForm || !addRoomUsername">
-				Create Room
-			</button>
-			<button class="button-cancel" @click="addNewRoom = false">
-				Cancel
-			</button>
-		</form>
+		<v-dialog v-model="dialogRemove" max-width="290">
+			<v-card>
+				<v-card-title class="headline">
+					Want to get out?
+				</v-card-title>
+				<v-card-actions>
+					<v-spacer></v-spacer>
+
+					<v-btn
+						color="white darken-1"
+						text
+						@click="dialogRemove = false"
+					>
+						Disagree
+					</v-btn>
+
+					<v-btn color="white darken-1" text @click="getOut">
+						Agree
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 
 		<form @submit.prevent="addRoomUser" v-if="inviteRoomId">
 			<input
@@ -42,6 +51,65 @@
 			</button>
 		</form>
 
+		<v-dialog v-model="dialog" persistent max-width="290">
+			<v-card>
+				<v-card-title class="headline">
+					Input room name
+				</v-card-title>
+				<v-card-text>
+					<v-text-field
+						v-model="addRoomUsername"
+						label="Room name"
+						required
+					></v-text-field>
+				</v-card-text>
+
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn color="white darken-1" text @click="dialog = false">
+						Cancel
+					</v-btn>
+					<v-btn color="white darken-1" text @click="createRoom">
+						Create room
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+
+		<v-dialog v-model="dialogRoom" persistent max-width="290">
+			<v-card>
+				<v-card-title class="headline">
+					Room detail
+				</v-card-title>
+				<v-card-text>
+					<v-text-field
+						label="Room name"
+						v-model="roomName"
+						required
+					></v-text-field>
+					<v-text-field
+						label="Room avatar"
+						v-model="roomAvatar"
+						required
+					></v-text-field>
+				</v-card-text>
+
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn
+						color="white darken-1"
+						text
+						@click="dialogRoom = false"
+					>
+						Cancel
+					</v-btn>
+					<v-btn color="white darken-1" text @click="updateRoomInfo">
+						Update room
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+
 		<chat-window
 			:height="screenHeight"
 			:theme="theme"
@@ -56,6 +124,7 @@
 			:room-actions="roomActions"
 			:menu-actions="menuActions"
 			:room-message="roomMessage"
+			:filterdLinks="filterdLinks"
 			@fetch-more-rooms="fetchMoreRooms"
 			@fetch-messages="fetchMessages"
 			@send-message="sendMessage"
@@ -82,7 +151,7 @@ export default {
 		ChatWindow,
 	},
 
-	props: ["currentUserId", "theme", "isDevice"],
+	props: ["currentUserId", "theme", "isDevice", "filterdLinks"],
 
 	data() {
 		return {
@@ -111,20 +180,27 @@ export default {
 			],
 			menuActions: [
 				{ name: "inviteUser", title: "Invite User" },
-				{ name: "removeUser", title: "Remove User" },
-				{ name: "deleteRoom", title: "Delete Room" },
+				{ name: "getoutRoom", title: "Get out Room" },
+				{ name: "updateRoom", title: "Update Room" },
 			],
 			styles: { container: { borderRadius: "4px" } },
 			connection: null,
 			snackBool: false,
 			snackText: "",
+			dialog: false,
+			dialogRemove: false,
+			getoutRoomId: null,
+			dialogRoom: false,
+			roomName: "",
+			roomAvatar: "",
+			updateRoomId: null,
 		};
 	},
 
 	mounted() {
 		try {
 			this.fetchRooms();
-			this.snackText = "Dang nhap thanh cong";
+			this.snackText = "Đăng nhập thành công";
 			this.snackBool = true;
 			// this.updateUserOnlineStatus();
 		} catch (error) {
@@ -144,7 +220,7 @@ export default {
 		screenHeight() {
 			return this.isDevice
 				? window.innerHeight + "px"
-				: "calc(100vh - 80px)";
+				: window.innerHeight + "px";
 		},
 		...mapGetters([
 			"user",
@@ -153,12 +229,12 @@ export default {
 			"listMessages",
 			"lastMessage",
 			"newMessage",
+			"roomInfo",
 		]),
 	},
-	created: function() {
+	async created() {
 		this.fetchMoreRooms();
 		this.socketSend();
-		//socket
 	},
 
 	methods: {
@@ -195,10 +271,16 @@ export default {
 		async fetchMessages({ room, options = {} }) {
 			this.$emit("show-demo-options", false);
 			if (options.reset) this.resetMessages();
+			console.log(room)
 
 			this.selectedRoom = room.roomId;
+			var roomId = this.selectedRoom;
+			const roomInfo = {
+				roomName: room.roomName,
+				avatar: room.avatar ? room.avatar : " ",
+			};
 			await this.$store
-				.dispatch("fetchRoomMessage", this.selectedRoom)
+				.dispatch("fetchRoomMessage", { roomId, roomInfo })
 				.then(() => (this.messages = this.listMessages));
 			this.messagesLoaded = false;
 		},
@@ -241,22 +323,24 @@ export default {
 					new Date(message.created_at).getMinutes();
 				this.vue.messages.push(message);
 				// notification new message
-				if (this.vue.currentUserId !== message["senderId"]) {
-					this.vue.sendNotification({
-						title: "Thong bao tu B1Corp webchat",
-						message:message["username"] +": "+ message["content"],
-						icon:
-							"https://cdn2.iconfinder.com/data/icons/mixed-rounded-flat-icon/512/megaphone-64.png",
-						clickCallback: function() {
-							alert("do something when clicked on notification");
-						},
-					});
-				}
+
+				this.vue.sendNotification({
+					userId: this.vue.currentUserId,
+					title: `New message from ${this.vue.roomInfo.roomName}`,
+					message: message["username"] + ": " + message["content"],
+					icon:
+						"https://cdn2.iconfinder.com/data/icons/mixed-rounded-flat-icon/512/megaphone-64.png",
+					clickCallback: function() {
+						alert("do something when clicked on notification");
+					},
+				});
 			};
 
 			// eslint-disable-next-line no-unused-vars
 			this.connection.onerror = function(event) {
 				alert("Connection Error");
+				this.vue.$store.dispatch("logout");
+				this.vue.$router.push("/login");
 			};
 
 			this.connection.onopen = function(event) {
@@ -340,12 +424,17 @@ export default {
 					return this.removeUser(roomId);
 				case "deleteRoom":
 					return this.deleteRoom(roomId);
+				case "getoutRoom":
+					return this.getoutRoom(roomId);
+				case "updateRoom":
+					return this.updateRoom(roomId);
 			}
 		},
 
 		addRoom() {
 			this.resetForms();
-			this.addNewRoom = true;
+			// this.addNewRoom = true;
+			this.dialog = true;
 		},
 
 		async createRoom() {
@@ -353,9 +442,24 @@ export default {
 
 			await this.$store
 				.dispatch("createRoom", this.addRoomUsername)
-				.catch((err) => console.error(err));
+				.then(() => {
+					const data = {
+						snackText: "Tạo phòng thành công",
+						snackBool: true,
+					};
+					this.$store.dispatch("addNotification", data);
+				})
+				.catch((err) => {
+					const data = {
+						snackText: "Tạo phòng thất bại",
+						snackBool: true,
+					};
+					this.store.dispatch("addNotification", data);
+					console.error(err);
+				});
 
 			this.addNewRoom = false;
+			this.dialog = false;
 			this.addRoomUsername = "";
 			this.fetchMoreRooms();
 		},
@@ -413,6 +517,76 @@ export default {
 			this.fetchMoreRooms();
 		},
 
+		getoutRoom(roomId) {
+			this.getoutRoomId = roomId;
+			this.dialogRemove = true;
+		},
+
+		async getOut() {
+			const data = {
+				snackText: "Thoát phòng thành công",
+				snackBool: true,
+			};
+			var room_id = this.getoutRoomId;
+			var username = this.user.username;
+			await this.$store
+				.dispatch("removeUser", { room_id, username })
+				.then((res) => {
+					if (!res.data) {
+						const data = {
+							snackText: "Thoát phòng thất bại",
+							snackBool: true,
+						};
+						this.$store.dispatch("addNotification", data);
+						return;
+					}
+					this.$store.dispatch("addNotification", data);
+				})
+				.catch((err) => {
+					const data = {
+						snackText: "Bạn là chủ, không thể thoát phòng",
+						snackBool: true,
+					};
+					this.$store.dispatch("addNotification", data);
+					console.log(err);
+				});
+			this.dialogRemove = false;
+		},
+
+		updateRoom(roomId) {
+			this.updateRoomId = roomId;
+			this.dialogRoom = true;
+			this.roomName = this.roomInfo.roomName;
+			this.roomAvatar = this.roomInfo.avatar;
+		},
+
+		async updateRoomInfo() {
+			const data = {
+				snackText: "Cập nhập thành công",
+				snackBool: true,
+			};
+
+			const info = {
+				room_id: this.updateRoomId,
+				room_name: this.roomName,
+				avatar: this.roomAvatar,
+			};
+
+			await this.$store
+				.dispatch("updateRoom", info)
+				.then(() => {
+					this.$store.dispatch("addNotification", data);
+				})
+				.catch((err) => {
+					const data = {
+						snackText: "Cập nhập thất bại",
+						snackBool: true,
+					};
+					this.$store.dispatch("addNotification", data);
+					console.log(err);
+				});
+		},
+
 		async deleteRoom(roomId) {
 			const data = {
 				snackText: `Đã xóa phòng`,
@@ -440,7 +614,14 @@ export default {
 
 		sendNotification: function(data) {
 			if (data == undefined || !data) {
-				return false;
+				return;
+			}
+			if (data.userId == this.currentUserId) {
+				console.log("Cung 1 nguoi na");
+				if (data.userId != this.currentUserId) {
+					console.log("Khac user na");
+				}
+				return;
 			}
 			var title = data.title === undefined ? "Notification" : data.title;
 			var clickCallback = data.clickCallback;
