@@ -56,7 +56,7 @@
 										Login
 									</v-btn>
 								</v-col>
-								<v-col cols="12" xsm="12" align-end>
+								<v-col class="align" cols="12" xsm="12" align-end>
 									Don't have account ?
 									<v-btn
 										color="warning"
@@ -149,9 +149,14 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.align {
+	text-align: center;
+}
+
 .bar {
 	background-color: #6e7f80;
+	text-align: center;
 }
 li > a.text {
 	text-decoration: none;

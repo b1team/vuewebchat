@@ -154,7 +154,30 @@ const actions = {
 				data: {
 					room_id: data.room_id,
 					room_name: data.room_name,
-					avatar: data.avatar
+					avatar: data.avatar,
+				},
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					commit("success");
+					resolve(response);
+				})
+				.catch((error) => {
+					reject(error);
+				});
+		});
+	},
+
+	getOutRoom({ commit }, { roomId, userName }) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "delete",
+				url: "rooms/getout",
+				data: {
+					room_id: roomId,
+					member_name: userName,
 				},
 				headers: {
 					Authorization: "Bearer " + localStorage.getItem("token"),

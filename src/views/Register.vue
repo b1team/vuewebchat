@@ -185,5 +185,10 @@ export default {
 <style scoped>
 .bar {
 	background-color: #6e7f80;
+	text-align: center;
+}
+
+.px-4 {
+	text-align: center;
 }
 </style>

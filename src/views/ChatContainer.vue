@@ -23,33 +23,55 @@
 			</v-card>
 		</v-dialog>
 
-		<form @submit.prevent="addRoomUser" v-if="inviteRoomId">
-			<input
-				type="text"
-				placeholder="Add username"
-				v-model="invitedUsername"
-			/>
-			<button type="submit" :disabled="disableForm || !invitedUsername">
-				Add User
-			</button>
-			<button class="button-cancel" @click="inviteRoomId = null">
-				Cancel
-			</button>
-		</form>
+		<v-dialog v-model="dialogaddUser" persistent max-width="290">
+			<v-card>
+				<v-card-title class="headline">
+					Input invite username
+				</v-card-title>
+				<v-card-text>
+					<v-text-field
+						v-model="invitedUsername"
+						label="Invite username"
+						required
+					></v-text-field>
+				</v-card-text>
 
-		<form @submit.prevent="deleteRoomUser" v-if="removeRoomId">
-			<input
-				type="text"
-				placeholder="enter username remove"
-				v-model="removeUserName"
-			/>
-			<button type="submit" :disabled="disableForm || !removeUserName">
-				Remove User
-			</button>
-			<button class="button-cancel" @click="removeRoomId = null">
-				Cancel
-			</button>
-		</form>
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn color="white darken-1" text @click="dialogaddUser = false">
+						Cancel
+					</v-btn>
+					<v-btn color="white darken-1" text @click="addRoomUser">
+						Invite
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+
+		<v-dialog v-model="dialogDeleteUser" persistent max-width="290">
+			<v-card>
+				<v-card-title class="headline">
+					Input delete user
+				</v-card-title>
+				<v-card-text>
+					<v-text-field
+						v-model="removeUserName"
+						label="username"
+						required
+					></v-text-field>
+				</v-card-text>
+
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn color="white darken-1" text @click="dialogDeleteUser = false">
+						Cancel
+					</v-btn>
+					<v-btn color="white darken-1" text @click="deleteRoomUser">
+						Delete user
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 
 		<v-dialog v-model="dialog" persistent max-width="290">
 			<v-card>
@@ -194,6 +216,8 @@ export default {
 			roomName: "",
 			roomAvatar: "",
 			updateRoomId: null,
+			dialogaddUser: false,
+			dialogDeleteUser: false,
 		};
 	},
 
@@ -271,7 +295,6 @@ export default {
 		async fetchMessages({ room, options = {} }) {
 			this.$emit("show-demo-options", false);
 			if (options.reset) this.resetMessages();
-			console.log(room)
 
 			this.selectedRoom = room.roomId;
 			var roomId = this.selectedRoom;
@@ -338,7 +361,6 @@ export default {
 
 			// eslint-disable-next-line no-unused-vars
 			this.connection.onerror = function(event) {
-				alert("Connection Error");
 				this.vue.$store.dispatch("logout");
 				this.vue.$router.push("/login");
 			};
@@ -467,6 +489,7 @@ export default {
 		inviteUser(roomId) {
 			this.resetForms();
 			this.inviteRoomId = roomId;
+			this.dialogaddUser = true;
 		},
 
 		async addRoomUser() {
@@ -486,12 +509,14 @@ export default {
 
 			this.inviteRoomId = null;
 			this.invitedUsername = "";
+			this.dialogaddUser = false;
 			this.fetchMoreRooms();
 		},
 
 		removeUser(roomId) {
 			this.resetForms();
 			this.removeRoomId = roomId;
+			this.dialogDeleteUser = true;
 			this.removeUsers = this.rooms.find(
 				(room) => room.roomId === roomId
 			).users;
@@ -514,6 +539,7 @@ export default {
 
 			this.removeRoomId = null;
 			this.removeUserName = "";
+			this.dialogDeleteUser = false;
 			this.fetchMoreRooms();
 		},
 
@@ -530,7 +556,7 @@ export default {
 			var room_id = this.getoutRoomId;
 			var username = this.user.username;
 			await this.$store
-				.dispatch("removeUser", { room_id, username })
+				.dispatch("getOutRoom", { room_id, username })
 				.then((res) => {
 					if (!res.data) {
 						const data = {
