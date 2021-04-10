@@ -38,7 +38,11 @@
 
 				<v-card-actions>
 					<v-spacer></v-spacer>
-					<v-btn color="white darken-1" text @click="dialogaddUser = false">
+					<v-btn
+						color="white darken-1"
+						text
+						@click="dialogaddUser = false"
+					>
 						Cancel
 					</v-btn>
 					<v-btn color="white darken-1" text @click="addRoomUser">
@@ -63,7 +67,11 @@
 
 				<v-card-actions>
 					<v-spacer></v-spacer>
-					<v-btn color="white darken-1" text @click="dialogDeleteUser = false">
+					<v-btn
+						color="white darken-1"
+						text
+						@click="dialogDeleteUser = false"
+					>
 						Cancel
 					</v-btn>
 					<v-btn color="white darken-1" text @click="deleteRoomUser">
@@ -127,6 +135,32 @@
 					</v-btn>
 					<v-btn color="white darken-1" text @click="updateRoomInfo">
 						Update room
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+
+		<v-dialog v-model="dialogMember" scrollable max-width="300px">
+			<v-card>
+				<v-card-title>Members</v-card-title>
+				<v-divider></v-divider>
+				<v-card-text>
+					<v-list-item
+						v-for="member in members"
+						:key="member.user_id"
+					>
+						<v-list-item-avatar>
+							<v-img :src="member.avatar"></v-img>
+						</v-list-item-avatar>
+						<v-list-item-title>{{
+							member.username
+						}}</v-list-item-title>
+					</v-list-item>
+				</v-card-text>
+				<v-divider></v-divider>
+				<v-card-actions>
+					<v-btn color="white" text @click="dialogMember = false">
+						OK
 					</v-btn>
 				</v-card-actions>
 			</v-card>
@@ -204,6 +238,7 @@ export default {
 				{ name: "inviteUser", title: "Invite User" },
 				{ name: "getoutRoom", title: "Get out Room" },
 				{ name: "updateRoom", title: "Update Room" },
+				{ name: "members", title: "Members" },
 			],
 			styles: { container: { borderRadius: "4px" } },
 			connection: null,
@@ -218,6 +253,7 @@ export default {
 			updateRoomId: null,
 			dialogaddUser: false,
 			dialogDeleteUser: false,
+			dialogMember: false,
 		};
 	},
 
@@ -254,6 +290,7 @@ export default {
 			"lastMessage",
 			"newMessage",
 			"roomInfo",
+			"members",
 		]),
 	},
 	async created() {
@@ -306,6 +343,8 @@ export default {
 				.dispatch("fetchRoomMessage", { roomId, roomInfo })
 				.then(() => (this.messages = this.listMessages));
 			this.messagesLoaded = false;
+
+			this.$store.dispatch("members", room.roomId);
 		},
 
 		async sendMessage({ content, roomId }) {
@@ -450,6 +489,8 @@ export default {
 					return this.getoutRoom(roomId);
 				case "updateRoom":
 					return this.updateRoom(roomId);
+				case "members":
+					return this.getMembers();
 			}
 		},
 
@@ -626,6 +667,10 @@ export default {
 				.catch((err) => console.log(err));
 
 			this.fetchMoreRooms();
+		},
+
+		getMembers(){
+			this.dialogMember = true;
 		},
 
 		resetForms() {

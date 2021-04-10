@@ -3,10 +3,12 @@ import axios from "axios";
 const state = {
 	rooms: null,
 	success: false,
+	members: null,
 };
 
 const getters = {
 	rooms: (state) => state.rooms,
+	members: (state) => state.members,
 };
 
 const actions = {
@@ -192,6 +194,26 @@ const actions = {
 				});
 		});
 	},
+
+	members({ commit }, roomId) {
+		return new Promise((resolve, reject) => {
+			axios({
+				method: "get",
+				url: "rooms/members?room_id=" + roomId,
+				headers: {
+					Authorization: "Bearer " + localStorage.getItem("token"),
+				},
+			})
+				.then((response) => {
+					const members = response.data.members;
+					commit("members", members);
+					resolve(members);
+				})
+				.catch((error) => {
+					reject(error);
+				});
+		});
+	},
 };
 
 const mutations = {
@@ -200,6 +222,9 @@ const mutations = {
 	},
 	success(state) {
 		state.success = true;
+	},
+	members(state, members) {
+		state.members = members;
 	},
 };
 
