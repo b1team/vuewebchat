@@ -100,3 +100,9 @@ export default {
 	},
 };
 </script>
+
+<style scoped>
+#inspire {
+	text-align: center;
+}
+</style>
