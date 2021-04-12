@@ -339,7 +339,10 @@ export default {
 		},
 
 		checkOwner(id) {
-			if (this.is_owner.owner && id == this.currentUserId) {
+			if (this.is_owner.owner && id === this.currentUserId) {
+				return false;
+			}
+			if (!this.is_owner.owner) {
 				return false;
 			}
 			return true;
@@ -358,9 +361,8 @@ export default {
 				.then(() => (this.list_rooms = this.rooms));
 		},
 
-		checkAdmin(id) {
+		setOwner(id) {
 			// cai nay la checkOwwnerrrnhe, tranh dung admin
-			const last_index = this.menuActions.length - 1;
 			this.$store.dispatch("members", id).then((response) => {
 				for (const member of response) {
 					if (
@@ -376,6 +378,10 @@ export default {
 					}
 				}
 			});
+		},
+
+		setDeleteRoom() {
+			const last_index = this.menuActions.length - 1;
 
 			const data = { name: "deleteRoom", title: "Xóa phòng" };
 
@@ -403,7 +409,7 @@ export default {
 		async fetchMessages({ room, options = {} }) {
 			this.$emit("show-demo-options", false);
 			this.setData({ room });
-			this.checkAdmin(room.roomId);
+			this.setOwner(room.roomId);
 			if (options.reset) this.resetMessages();
 
 			var roomId = room.roomId;
@@ -414,6 +420,7 @@ export default {
 			await this.$store
 				.dispatch("fetchRoomMessage", { roomId, roomInfo })
 				.then(() => (this.messages = this.listMessages));
+			this.setDeleteRoom();
 			this.messagesLoaded = false;
 		},
 
