@@ -45,17 +45,9 @@
 							/>
 						</slot>
 					</span>
-					<div
-						v-if="room.lastMessage && !room.lastMessage.deleted && isAudio"
-						class="vac-text-ellipsis"
-					>
-						<slot name="microphone-icon">
-							<svg-icon name="microphone" class="vac-icon-microphone" />
-						</slot>
-						{{ formattedDuration }}
-					</div>
+
 					<format-message
-						v-else-if="room.lastMessage"
+						v-if="room.lastMessage"
 						:content="getLastMessage"
 						:deleted="!!room.lastMessage.deleted && !typingUsers"
 						:users="room.users"
@@ -80,35 +72,7 @@
 						>
 							{{ room.unreadCount }}
 						</div>
-						<slot name="room-list-options" v-bind="{ room }">
-							<div
-								v-if="roomActions.length"
-								class="vac-svg-button vac-list-room-options"
-								@click.stop="roomMenuOpened = room.roomId"
-							>
-								<slot name="room-list-options-icon">
-									<svg-icon name="dropdown" param="room" />
-								</slot>
-							</div>
-							<transition v-if="roomActions.length" name="vac-slide-left">
-								<div
-									v-if="roomMenuOpened === room.roomId"
-									v-click-outside="closeRoomMenu"
-									class="vac-menu-options"
-								>
-									<div class="vac-menu-list">
-										<div v-for="action in roomActions" :key="action.name">
-											<div
-												class="vac-menu-item"
-												@click.stop="roomActionHandler(action)"
-											>
-												{{ action.title }}
-											</div>
-										</div>
-									</div>
-								</div>
-							</transition>
-						</slot>
+						
 					</div>
 				</div>
 			</div>
@@ -141,7 +105,6 @@ export default {
 		room: { type: Object, required: true },
 		textFormatting: { type: Boolean, required: true },
 		textMessages: { type: Object, required: true },
-		roomActions: { type: Array, required: true }
 	},
 
 	data() {
@@ -302,14 +265,6 @@ export default {
 	width: 14px;
 	margin-top: -2px;
 	margin-right: 2px;
-}
-
-.vac-icon-microphone {
-	height: 15px;
-	width: 15px;
-	vertical-align: middle;
-	margin: -3px 1px 0 -2px;
-	fill: var(--chat-room-color-message);
 }
 
 .vac-room-options-container {

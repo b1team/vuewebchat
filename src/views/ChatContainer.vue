@@ -3,21 +3,21 @@
 		<v-dialog v-model="dialogRemove" max-width="290">
 			<v-card>
 				<v-card-title class="headline">
-					Want to get out?
+					Bạn muốn thoát ?
 				</v-card-title>
 				<v-card-actions>
 					<v-spacer></v-spacer>
 
 					<v-btn
-						color="white darken-1"
+						color="black darken-1"
 						text
 						@click="dialogRemove = false"
 					>
-						Disagree
+						Không
 					</v-btn>
 
 					<v-btn color="white darken-1" text @click="getOut">
-						Agree
+						Đồng ý
 					</v-btn>
 				</v-card-actions>
 			</v-card>
@@ -26,12 +26,12 @@
 		<v-dialog v-model="dialogaddUser" persistent max-width="290">
 			<v-card>
 				<v-card-title class="headline">
-					Input invite username
+					Mời vào phòng
 				</v-card-title>
 				<v-card-text>
 					<v-text-field
 						v-model="invitedUsername"
-						label="Invite username"
+						label="Tên người dùng"
 						required
 					></v-text-field>
 				</v-card-text>
@@ -39,43 +39,35 @@
 				<v-card-actions>
 					<v-spacer></v-spacer>
 					<v-btn
-						color="white darken-1"
+						color="black lighten-1"
 						text
 						@click="dialogaddUser = false"
 					>
-						Cancel
+						Thoát
 					</v-btn>
 					<v-btn color="white darken-1" text @click="addRoomUser">
-						Invite
+						Mời
 					</v-btn>
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
 
-		<v-dialog v-model="dialogDeleteUser" persistent max-width="290">
+		<v-dialog v-model="dialogDeleteUser" persistent max-width="300">
 			<v-card>
 				<v-card-title class="headline">
-					Input delete user
+					Bạn thực sự muốn đuổi thành viên này?
 				</v-card-title>
-				<v-card-text>
-					<v-text-field
-						v-model="removeUserName"
-						label="username"
-						required
-					></v-text-field>
-				</v-card-text>
-
 				<v-card-actions>
 					<v-spacer></v-spacer>
 					<v-btn
-						color="white darken-1"
+						color="black darken-1"
 						text
 						@click="dialogDeleteUser = false"
 					>
-						Cancel
+						Thoát
 					</v-btn>
 					<v-btn color="white darken-1" text @click="deleteRoomUser">
-						Delete user
+						Xóa
 					</v-btn>
 				</v-card-actions>
 			</v-card>
@@ -84,23 +76,23 @@
 		<v-dialog v-model="dialog" persistent max-width="290">
 			<v-card>
 				<v-card-title class="headline">
-					Input room name
+					Tạo phòng
 				</v-card-title>
 				<v-card-text>
 					<v-text-field
 						v-model="addRoomUsername"
-						label="Room name"
+						label="Tên phòng"
 						required
 					></v-text-field>
 				</v-card-text>
 
 				<v-card-actions>
 					<v-spacer></v-spacer>
-					<v-btn color="white darken-1" text @click="dialog = false">
-						Cancel
+					<v-btn color="black darken-1" text @click="dialog = false">
+						Thoát
 					</v-btn>
 					<v-btn color="white darken-1" text @click="createRoom">
-						Create room
+						Tạo phòng
 					</v-btn>
 				</v-card-actions>
 			</v-card>
@@ -109,16 +101,16 @@
 		<v-dialog v-model="dialogRoom" persistent max-width="290">
 			<v-card>
 				<v-card-title class="headline">
-					Room detail
+					Thông tin phòng
 				</v-card-title>
 				<v-card-text>
 					<v-text-field
-						label="Room name"
+						label="Tên phòng"
 						v-model="roomName"
 						required
 					></v-text-field>
 					<v-text-field
-						label="Room avatar"
+						label="Hình đại diện"
 						v-model="roomAvatar"
 						required
 					></v-text-field>
@@ -127,14 +119,14 @@
 				<v-card-actions>
 					<v-spacer></v-spacer>
 					<v-btn
-						color="white darken-1"
+						color="black darken-1"
 						text
 						@click="dialogRoom = false"
 					>
-						Cancel
+						Thoát
 					</v-btn>
 					<v-btn color="white darken-1" text @click="updateRoomInfo">
-						Update room
+						Cập nhập
 					</v-btn>
 				</v-card-actions>
 			</v-card>
@@ -142,7 +134,7 @@
 
 		<v-dialog v-model="dialogMember" scrollable max-width="300px">
 			<v-card>
-				<v-card-title>Members</v-card-title>
+				<v-card-title>Thành viên</v-card-title>
 				<v-divider></v-divider>
 				<v-card-text>
 					<v-list-item
@@ -155,12 +147,45 @@
 						<v-list-item-title>{{
 							member.username
 						}}</v-list-item-title>
+						<v-list-item-action>
+							<v-btn
+								v-if="checkOwner(member.user_id)"
+								class="ma-1"
+								color="error"
+								plain
+								style="background-color: white;"
+								@click="deleteUser(member.username)"
+							>
+								Xóa
+							</v-btn>
+						</v-list-item-action>
 					</v-list-item>
 				</v-card-text>
 				<v-divider></v-divider>
 				<v-card-actions>
 					<v-btn color="white" text @click="dialogMember = false">
 						OK
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+
+		<v-dialog v-model="dialogDeleteRoom" persistent max-width="300">
+			<v-card>
+				<v-card-title class="headline">
+					Bạn thực sự muốn xóa phòng?
+				</v-card-title>
+				<v-card-actions>
+					<v-spacer></v-spacer>
+					<v-btn
+						color="black darken-1"
+						text
+						@click="dialogDeleteRoom = false"
+					>
+						Không
+					</v-btn>
+					<v-btn color="white darken-1" text @click="removeRoom">
+						Xóa
 					</v-btn>
 				</v-card-actions>
 			</v-card>
@@ -177,7 +202,6 @@
 			:messages="messages"
 			:messages-loaded="messagesLoaded"
 			:rooms-loaded="roomsLoaded"
-			:room-actions="roomActions"
 			:menu-actions="menuActions"
 			:room-message="roomMessage"
 			:filterdLinks="filterdLinks"
@@ -228,17 +252,11 @@ export default {
 			invitedUsername: "",
 			removeRoomId: null,
 			removeUserName: "",
-			removeUsers: [],
-			roomActions: [
-				{ name: "inviteUser", title: "Invite User" },
-				{ name: "removeUser", title: "Remove User" },
-				{ name: "deleteRoom", title: "Delete Room" },
-			],
 			menuActions: [
-				{ name: "inviteUser", title: "Invite User" },
-				{ name: "getoutRoom", title: "Get out Room" },
-				{ name: "updateRoom", title: "Update Room" },
-				{ name: "members", title: "Members" },
+				{ name: "inviteUser", title: "Mời vào phòng" },
+				{ name: "getoutRoom", title: "Rời phòng" },
+				{ name: "updateRoom", title: "Cập nhập phòng" },
+				{ name: "members", title: "Thành viên" },
 			],
 			styles: { container: { borderRadius: "4px" } },
 			connection: null,
@@ -254,6 +272,9 @@ export default {
 			dialogaddUser: false,
 			dialogDeleteUser: false,
 			dialogMember: false,
+			dialogDeleteRoom: false,
+			is_owner: { owner: false, id: null },
+			senderRoomName: null,
 		};
 	},
 
@@ -293,6 +314,7 @@ export default {
 			"members",
 		]),
 	},
+
 	async created() {
 		this.fetchMoreRooms();
 		this.socketSend();
@@ -316,6 +338,13 @@ export default {
 			this.fetchMoreRooms();
 		},
 
+		checkOwner(id) {
+			if (this.is_owner.owner && id == this.currentUserId) {
+				return false;
+			}
+			return true;
+		},
+
 		message_is_exist: function(message) {
 			var message_id = message.id;
 			for (const message of this.messages)
@@ -329,12 +358,55 @@ export default {
 				.then(() => (this.list_rooms = this.rooms));
 		},
 
+		checkAdmin(id) {
+			// cai nay la checkOwwnerrrnhe, tranh dung admin
+			const last_index = this.menuActions.length - 1;
+			this.$store.dispatch("members", id).then((response) => {
+				for (const member of response) {
+					if (
+						member.user_id == this.currentUserId &&
+						member.is_owner
+					) {
+						this.is_owner.owner = true;
+						this.is_owner.id = this.currentUserId;
+						break;
+					} else {
+						this.is_owner.owner = false;
+						this.is_owner.id = this.currentUserId;
+					}
+				}
+			});
+
+			const data = { name: "deleteRoom", title: "Xóa phòng" };
+
+			if (this.is_owner.owner) {
+				if (this.menuActions[last_index].name == data.name) {
+					return;
+				} else {
+					this.menuActions.push(data);
+				}
+			} else {
+				if (this.menuActions[last_index].name == data.name) {
+					this.menuActions.splice(last_index, 1);
+				} else {
+					return;
+				}
+			}
+		},
+
+		setData({ room }) {
+			this.roomId = room.roomId;
+			this.roomName = room.roomName;
+			this.roomAvatar = room.avatar;
+		},
+
 		async fetchMessages({ room, options = {} }) {
 			this.$emit("show-demo-options", false);
+			this.setData({ room });
+			this.checkAdmin(room.roomId);
 			if (options.reset) this.resetMessages();
 
-			this.selectedRoom = room.roomId;
-			var roomId = this.selectedRoom;
+			var roomId = room.roomId;
 			const roomInfo = {
 				roomName: room.roomName,
 				avatar: room.avatar ? room.avatar : " ",
@@ -343,8 +415,6 @@ export default {
 				.dispatch("fetchRoomMessage", { roomId, roomInfo })
 				.then(() => (this.messages = this.listMessages));
 			this.messagesLoaded = false;
-
-			this.$store.dispatch("members", room.roomId);
 		},
 
 		async sendMessage({ content, roomId }) {
@@ -352,6 +422,7 @@ export default {
 			await this.$store
 				.dispatch("sendMessages", { content, roomId, username })
 				.then(() => {
+					this.messages.push(this.newMessage);
 					this.connection.send(JSON.stringify(this.newMessage));
 
 					for (const room of this.list_rooms) {
@@ -361,6 +432,33 @@ export default {
 					}
 				})
 				.catch((error) => console.error(error));
+		},
+
+		setLastMessage(roomId, { message }) {
+			this.list_rooms.filter(function(room) {
+				if (room.roomId === roomId) {
+					room.lastMessage = {
+						content: message.content,
+						senderId: message.sender_id,
+						username: message.username,
+						timestamp: new Date(
+							message.created_at
+						).toLocaleDateString("en-GB"),
+						saved: true,
+						seen: message.seen,
+						new: true,
+					};
+				}
+			});
+		},
+
+		getRoomNamebyID(roomId) {
+			for (const room of this.list_rooms) {
+				if (room.roomId === roomId) {
+					this.senderRoomName = room.roomName;
+					break;
+				}
+			}
 		},
 
 		socketSend: function() {
@@ -374,6 +472,22 @@ export default {
 				event.preventDefault();
 				var data = JSON.parse(event.data);
 				var message = data.payload;
+				this.vue.getRoomNamebyID(message["room_id"]);
+				if (message["room_id"] !== this.vue.roomId) {
+					this.vue.setLastMessage(message["room_id"], { message });
+					this.vue.sendNotification({
+						userId: message["sender_id"],
+						title: `Tin nhắn mới từ ${this.vue.senderRoomName}`,
+						message:
+							message["username"] + ": " + message["content"],
+						icon:
+							"https://cdn2.iconfinder.com/data/icons/mixed-rounded-flat-icon/512/megaphone-64.png",
+						clickCallback: function() {
+							alert("Thông báo");
+						},
+					});
+					return;
+				}
 				if (this.vue.message_is_exist(message)) {
 					return;
 				}
@@ -385,15 +499,14 @@ export default {
 					new Date(message.created_at).getMinutes();
 				this.vue.messages.push(message);
 				// notification new message
-
 				this.vue.sendNotification({
-					userId: this.vue.currentUserId,
-					title: `New message from ${this.vue.roomInfo.roomName}`,
+					userId: message["senderId"],
+					title: `Tin nhắn mới từ ${this.vue.senderRoomName}`,
 					message: message["username"] + ": " + message["content"],
 					icon:
 						"https://cdn2.iconfinder.com/data/icons/mixed-rounded-flat-icon/512/megaphone-64.png",
 					clickCallback: function() {
-						alert("do something when clicked on notification");
+						alert("Thông báo");
 					},
 				});
 			};
@@ -419,7 +532,7 @@ export default {
 				? "HH:mm"
 				: "DD/MM/YY";
 			const result = parseTimestamp(timestamp, timestampFormat);
-			return timestampFormat === "HH:mm" ? `Today, ${result}` : result;
+			return timestampFormat === "HH:mm" ? `Hôm nay, ${result}` : result;
 		},
 
 		async editMessage({ messageId, newContent }) {
@@ -446,7 +559,7 @@ export default {
 					seen: true,
 					new: true,
 				};
-				const roomId = this.$store.getters.idRoom;
+				const roomId = this.roomId;
 				this.list_rooms.filter(function(room) {
 					if (room.roomId === roomId) {
 						room.lastMessage = lastMessage;
@@ -460,7 +573,7 @@ export default {
 			const index = this.$store.getters.deleteMessage.index;
 			this.messages.splice(index, 1);
 
-			const roomId = this.$store.getters.idRoom;
+			const roomId = this.roomId;
 			const lastMessage = this.messages[this.messages.length - 1];
 			const format_lastMessage = {
 				content: lastMessage.content,
@@ -481,10 +594,8 @@ export default {
 			switch (action.name) {
 				case "inviteUser":
 					return this.inviteUser(roomId);
-				case "removeUser":
-					return this.removeUser(roomId);
 				case "deleteRoom":
-					return this.deleteRoom(roomId);
+					return this.deleteRoom();
 				case "getoutRoom":
 					return this.getoutRoom(roomId);
 				case "updateRoom":
@@ -554,30 +665,36 @@ export default {
 			this.fetchMoreRooms();
 		},
 
-		removeUser(roomId) {
-			this.resetForms();
-			this.removeRoomId = roomId;
+		deleteUser(name) {
+			this.removeRoomId = this.roomId;
+			this.removeUserName = name;
 			this.dialogDeleteUser = true;
-			this.removeUsers = this.rooms.find(
-				(room) => room.roomId === roomId
-			).users;
 		},
 
 		async deleteRoomUser() {
 			this.disableForm = true;
-			const roomId = this.removeRoomId;
-			const userName = this.removeUserName;
+			var roomId = this.removeRoomId;
+			var userName = this.removeUserName; // this.removeUserName
+
 			const data = {
 				snackText: `Đã đuổi ${userName} ra khỏi phòng`,
 				snackBool: true,
 			};
 			await this.$store
 				.dispatch("removeUser", { roomId, userName })
-				.then(() => {
-					this.$store.dispatch("addNotification", data);
+				.then((response) => {
+					if (!response.success) {
+						var data = {
+							snackText: `Có lỗi`,
+							snackBool: true,
+						};
+						this.$store.dispatch("addNotification", data);
+						return;
+					}
 				})
 				.catch((err) => console.log(err));
 
+			this.$store.dispatch("addNotification", data);
 			this.removeRoomId = null;
 			this.removeUserName = "";
 			this.dialogDeleteUser = false;
@@ -654,22 +771,26 @@ export default {
 				});
 		},
 
-		async deleteRoom(roomId) {
+		async removeRoom() {
 			const data = {
 				snackText: `Đã xóa phòng`,
 				snackBool: true,
 			};
 			await this.$store
-				.dispatch("removeRoom", roomId)
+				.dispatch("removeRoom", this.roomId)
 				.then(() => {
 					this.$store.dispatch("addNotification", data);
 				})
 				.catch((err) => console.log(err));
-
+			this.dialogDeleteRoom = false;
 			this.fetchMoreRooms();
 		},
 
-		getMembers(){
+		deleteRoom() {
+			this.dialogDeleteRoom = true;
+		},
+
+		getMembers() {
 			this.dialogMember = true;
 		},
 
@@ -687,13 +808,11 @@ export default {
 			if (data == undefined || !data) {
 				return;
 			}
-			if (data.userId == this.currentUserId) {
-				console.log("Cung 1 nguoi na");
-				if (data.userId != this.currentUserId) {
-					console.log("Khac user na");
-				}
+			if (data.userId === this.currentUserId) {
+				console("1");
 				return;
 			}
+			console.log("2");
 			var title = data.title === undefined ? "Notification" : data.title;
 			var clickCallback = data.clickCallback;
 			var message = data.message === undefined ? "null" : data.message;

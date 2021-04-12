@@ -7,6 +7,7 @@
 				:user="user"
 				:iconDetails="iconDetails"
 				:iconLogout="iconLogout"
+				:isMobile="isMobile"
 			/>
 
 			<rooms-list
@@ -16,7 +17,6 @@
 				:loading-rooms="loadingRooms"
 				:rooms-loaded="roomsLoaded"
 				:room="room"
-				:room-actions="roomActions"
 				:text-messages="t"
 				:show-add-room="showAddRoom"
 				:show-rooms-list="showRoomsList"
@@ -108,15 +108,14 @@ export default {
 		loadFirstRoom: { type: Boolean, default: true },
 		messages: { type: Array, default: () => [] },
 		messagesLoaded: { type: Boolean, default: false },
-		roomActions: { type: Array, default: () => [] },
 		menuActions: { type: Array, default: () => [] },
 		messageActions: {
 			type: Array,
 			default: () => [
-				{ name: "editMessage", title: "Edit Message", onlyMe: true },
+				{ name: "editMessage", title: "Sửa tin nhắn", onlyMe: true },
 				{
 					name: "deleteMessage",
-					title: "Delete Message",
+					title: "Xóa tin nhắn",
 					onlyMe: true,
 				},
 			],

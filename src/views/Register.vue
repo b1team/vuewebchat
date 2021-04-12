@@ -9,7 +9,7 @@
 			<div>
 				<div class="bar">
 					<v-icon large>mdi-account-outline</v-icon>
-					<div class="caption py-1">Register</div>
+					<div class="caption py-1">Đăng ký</div>
 				</div>
 				<v-card class="px-4">
 					<v-card-text>
@@ -23,7 +23,7 @@
 									<v-text-field
 										v-model="user.username"
 										:rules="[rules.required]"
-										label="Username"
+										label="Tên đăng nhập"
 										maxlength="20"
 										required
 									></v-text-field>
@@ -31,7 +31,7 @@
 								<v-col cols="12">
 									<v-text-field
 										v-model="user.name"
-										label="Name"
+										label="Tên người dùng"
 										required
 									></v-text-field>
 								</v-col>
@@ -44,7 +44,7 @@
 										:rules="[rules.required, rules.min]"
 										:type="show1 ? 'text' : 'password'"
 										name="input-10-1"
-										label="Password"
+										label="Mật khẩu"
 										hint="At least 8 characters"
 										counter
 										@click:append="show1 = !show1"
@@ -60,7 +60,7 @@
 										:rules="[rules.required, passwordMatch]"
 										:type="show1 ? 'text' : 'password'"
 										name="input-10-1"
-										label="Confirm Password"
+										label="Nhập lại mật khẩu"
 										counter
 										@click:append="show1 = !show1"
 									></v-text-field>
@@ -78,11 +78,11 @@
 										:disabled="!valid"
 										color="success"
 										@click="validate"
-										>Register</v-btn
+										>Đăng ký</v-btn
 									>
 								</v-col>
 								<v-col cols="12" xsm="12" align-end>
-									You have account ?
+									Bạn đã có tài khoản?
 									<v-btn
 										color="warning"
 										@click="resetValidation"
@@ -109,7 +109,7 @@
 													:href="href"
 													class="text"
 													@click="navigate"
-													>Login
+													>Đăng nhập
 												</a>
 											</li>
 										</router-link>
@@ -138,21 +138,21 @@ export default {
 			},
 			verify: "",
 			emailRules: [
-				(v) => !!v || "Required",
-				(v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+				(v) => !!v || "Không được bỏ trống",
+				(v) => /.+@.+\..+/.test(v) || "E-mail phải đúng",
 			],
 
 			show1: false,
 			rules: {
-				required: (value) => !!value || "Required.",
-				min: (v) => (v && v.length >= 8) || "Min 8 characters",
+				required: (value) => !!value || "Không được bỏ trống",
+				min: (v) => (v && v.length >= 8) || "Có ít nhất 8 ký tự",
 			},
 		};
 	},
 	computed: {
 		passwordMatch() {
 			return () =>
-				this.user.password === this.verify || "Password must match";
+				this.user.password === this.verify || "Mật khẩu phải chính xác";
 		},
 	},
 	methods: {

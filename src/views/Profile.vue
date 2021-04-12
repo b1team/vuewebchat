@@ -16,26 +16,26 @@
 									</v-avatar>
 								</v-col>
 								<v-col cols="12" sm="6" md="4">
-									<h2>{{ user.username }} Profile</h2>
+									<h2>Thông tin {{ user.username }}</h2>
 									id: {{ user.user_id }}
 								</v-col>
 								<v-col cols="12">
 									<v-text-field
-										label="Username"
+										label="Tên đăng nhập"
 										v-model="username"
 										required
 									></v-text-field>
 								</v-col>
 								<v-col cols="12">
 									<v-text-field
-										label="Name"
+										label="Tên người dùng"
 										v-model="name"
 										required
 									></v-text-field>
 								</v-col>
 								<v-col cols="12">
 									<v-text-field
-										label="Avatar url"
+										label="Đường dẫn ảnh đại diện"
 										v-model="avatar_url"
 										required
 									></v-text-field>
@@ -46,10 +46,10 @@
 					<v-card-actions>
 						<v-spacer></v-spacer>
 						<v-btn color="blue darken-1" text @click="close">
-							Close
+							Đóng
 						</v-btn>
 						<v-btn color="blue darken-1" text @click="save">
-							Save
+							Cập nhập
 						</v-btn>
 					</v-card-actions>
 				</v-card>

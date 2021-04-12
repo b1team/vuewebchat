@@ -16,7 +16,6 @@ const state = {
 	messageLoaded: false,
 	lastMessage: null,
 	newMessage: null,
-	idRoom: null,
 	roomInfo: null,
 	editMessageContent: null,
 	editMessageId: null,
@@ -29,7 +28,6 @@ const getters = {
 	messageLoaded: (state) => state.messageLoaded,
 	lastMessage: (state) => state.lastMessage,
 	newMessage: (state) => state.newMessage,
-	idRoom: (state) => state.idRoom,
 	editMessageContent: (state) => state.editMessageContent,
 	editMessageId: (state) => state.editMessageId,
 	deleteMessage: (state) => state.deleteMessage,
@@ -73,7 +71,7 @@ const actions = {
 						if (messages.length == response.data.count) {
 							return (state.messagesLoaded = true);
 						}
-						commit("listMessages", { messages, roomId, roomInfo });
+						commit("listMessages", { messages, roomInfo });
 						resolve(response);
 
 					}
@@ -190,9 +188,8 @@ const actions = {
 };
 
 const mutations = {
-	listMessages(state, { messages, roomId, roomInfo }) {
+	listMessages(state, { messages, roomInfo }) {
 		state.listMessages = messages;
-		state.idRoom = roomId;
 		state.roomInfo = roomInfo;
 	},
 	send(state, { newMessage, lastMessage }) {

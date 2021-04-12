@@ -20,8 +20,7 @@
 <script>
 import ChatContainer from "./ChatContainer";
 import { mapGetters } from "vuex";
-import { mdiAccount } from "@mdi/js";
-import { mdiHomeAccount, mdiAccountDetails } from "@mdi/js";
+import { mdiHomeAccount, mdiAccountDetails, mdiAccount } from "@mdi/js";
 
 export default {
 	name: "Home",
@@ -38,10 +37,10 @@ export default {
 			updatingData: false,
 			icons: { mdiAccount },
 			links: [
-				{ url: "/", name: "Home", icon: mdiHomeAccount },
-				{ url: "/profile", name: "Profile", icon: mdiAccountDetails },
-				{ url: "/login", name: "Login" },
-				{ url: "/register", name: "Register" },
+				{ url: "/", name: "Trang chủ", icon: mdiHomeAccount },
+				{ url: "/profile", name: "Thông tin", icon: mdiAccountDetails },
+				{ url: "/login", name: "Đăng nhập" },
+				{ url: "/register", name: "Đăng ký" },
 			],
 		};
 	},

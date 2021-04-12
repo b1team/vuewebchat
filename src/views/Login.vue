@@ -9,7 +9,7 @@
 			<div>
 				<div class="bar">
 					<v-icon large>mdi-account</v-icon>
-					<div class="caption py-1">Login</div>
+					<div class="caption py-1">Đăng nhập</div>
 				</div>
 
 				<v-card class="px-4">
@@ -19,7 +19,7 @@
 								<v-col cols="12">
 									<v-text-field
 										v-model="user.loginUsername"
-										label="Username"
+										label="Tên đăng nhập"
 										required
 									></v-text-field>
 								</v-col>
@@ -30,8 +30,8 @@
 										:rules="[rules.required, rules.min]"
 										:type="show1 ? 'text' : 'password'"
 										name="input-10-1"
-										label="Password"
-										hint="At least 8 characters"
+										label="Mật khẩu"
+										hint="Ít nhất 8 ký tự"
 										counter
 										@click:append="show1 = !show1"
 									></v-text-field>
@@ -53,11 +53,11 @@
 										color="success"
 										@click="validate"
 									>
-										Login
+										Đăng nhập
 									</v-btn>
 								</v-col>
 								<v-col class="align" cols="12" xsm="12" align-end>
-									Don't have account ?
+									Chưa có tài khoản ?
 									<v-btn
 										color="warning"
 										@click="resetValidation"
@@ -84,7 +84,7 @@
 													:href="href"
 													class="text"
 													@click="navigate"
-													>Register
+													>Đăng ký
 												</a>
 											</li>
 										</router-link>
@@ -109,13 +109,13 @@ export default {
 			loginPassword: "",
 			loginUsername: "",
 		},
-		textLogin: "Dang nhap thanh cong",
+		textLogin: "Đăng nhập thành công",
 		login: false,
 
 		show1: false,
 		rules: {
-			required: (value) => !!value || "Required.",
-			min: (v) => (v && v.length >= 8) || "Min 8 characters",
+			required: (value) => !!value || "Không được bỏ trống",
+			min: (v) => (v && v.length >= 8) || "Ít nhất 8 ký tự",
 		},
 	}),
 	methods: {

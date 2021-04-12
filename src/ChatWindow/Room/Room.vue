@@ -175,11 +175,6 @@
 						</div>
 					</template>
 
-					<div v-else class="vac-svg-button" @click="toggleRecorder(true)">
-						<slot name="microphone-icon">
-							<svg-icon name="microphone" class="vac-icon-microphone" />
-						</slot>
-					</div>
 				</div>
 
 				<div v-if="imageFile" class="vac-media-container">
@@ -1112,11 +1107,6 @@ export default {
 
 	svg,
 	.vac-wrapper {
-		margin: 0 7px;
-	}
-
-	.vac-icon-microphone {
-		fill: var(--chat-icon-color-microphone);
 		margin: 0 7px;
 	}
 

@@ -1,5 +1,5 @@
 <template>
-	<v-card id="header">
+	<v-card v-if="!isMobile" id="header" class="mx-auto">
 		<v-navigation-drawer
 			id="header"
 			v-model="drawer"
@@ -46,7 +46,7 @@
 								href="javascript:void(0)"
 								@click="$emit('logout')"
 							>
-								Logout</a
+								Đăng xuất</a
 							></v-list-item-title
 						>
 					</v-list-item-content>
@@ -58,7 +58,7 @@
 
 <script>
 export default {
-	props: ["links", "user", "iconDetails", "iconLogout"],
+	props: ["links", "user", "iconDetails", "iconLogout", "isMobile"],
 	data() {
 		return {
 			drawer: true,

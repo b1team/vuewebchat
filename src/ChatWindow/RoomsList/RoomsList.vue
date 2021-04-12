@@ -41,7 +41,6 @@
 					:room="fRoom"
 					:text-formatting="textFormatting"
 					:text-messages="textMessages"
-					:room-actions="roomActions"
 					@room-action-handler="$emit('room-action-handler', $event)"
 				>
 					<template v-for="(i, name) in $scopedSlots" #[name]="data">
@@ -96,7 +95,6 @@ export default {
 		loadingRooms: { type: Boolean, required: true },
 		roomsLoaded: { type: Boolean, required: true },
 		room: { type: Object, required: true },
-		roomActions: { type: Array, required: true }
 	},
 
 	data() {
