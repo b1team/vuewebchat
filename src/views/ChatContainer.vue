@@ -2,9 +2,7 @@
 	<div class="window-container" :class="{ 'window-mobile': isDevice }">
 		<v-dialog v-model="dialogRemove" max-width="290">
 			<v-card>
-				<v-card-title class="headline">
-					Bạn muốn thoát ?
-				</v-card-title>
+				<v-card-title class="headline"> Bạn muốn thoát ? </v-card-title>
 				<v-card-actions>
 					<v-spacer></v-spacer>
 
@@ -25,9 +23,7 @@
 
 		<v-dialog v-model="dialogaddUser" persistent max-width="290">
 			<v-card>
-				<v-card-title class="headline">
-					Mời vào phòng
-				</v-card-title>
+				<v-card-title class="headline"> Mời vào phòng </v-card-title>
 				<v-card-text>
 					<v-text-field
 						v-model="invitedUsername"
@@ -75,9 +71,7 @@
 
 		<v-dialog v-model="dialog" persistent max-width="290">
 			<v-card>
-				<v-card-title class="headline">
-					Tạo phòng
-				</v-card-title>
+				<v-card-title class="headline"> Tạo phòng </v-card-title>
 				<v-card-text>
 					<v-text-field
 						v-model="addRoomUsername"
@@ -100,9 +94,7 @@
 
 		<v-dialog v-model="dialogRoom" persistent max-width="290">
 			<v-card>
-				<v-card-title class="headline">
-					Thông tin phòng
-				</v-card-title>
+				<v-card-title class="headline"> Thông tin phòng </v-card-title>
 				<v-card-text>
 					<v-text-field
 						label="Tên phòng"
@@ -153,7 +145,7 @@
 								class="ma-1"
 								color="error"
 								plain
-								style="background-color: white;"
+								style="background-color: white"
 								@click="deleteUser(member.username)"
 							>
 								Xóa
@@ -260,6 +252,7 @@ export default {
 			],
 			styles: { container: { borderRadius: "4px" } },
 			connection: null,
+			socketNotification: null,
 			snackBool: false,
 			snackText: "",
 			dialog: false,
@@ -315,9 +308,10 @@ export default {
 		]),
 	},
 
-	async created() {
+	created() {
 		this.fetchMoreRooms();
 		this.socketSend();
+		this.socketNotify();
 	},
 
 	methods: {
@@ -356,13 +350,16 @@ export default {
 		},
 
 		async fetchMoreRooms() {
-			await this.$store
-				.dispatch("fetchAllRooms")
-				.then(() => (this.list_rooms = this.rooms));
+			await this.$store.dispatch("fetchAllRooms").then(() => {
+				this.list_rooms = this.rooms.sort(
+					(a, b) =>
+						new Date(b.lastMessage.date) -
+						new Date(a.lastMessage.date)
+				);
+			});
 		},
 
 		setOwner(id) {
-			// cai nay la checkOwwnerrrnhe, tranh dung admin
 			this.$store.dispatch("members", id).then((response) => {
 				for (const member of response) {
 					if (
@@ -430,13 +427,12 @@ export default {
 				.dispatch("sendMessages", { content, roomId, username })
 				.then(() => {
 					this.messages.push(this.newMessage);
-					this.connection.send(JSON.stringify(this.newMessage));
-
 					for (const room of this.list_rooms) {
 						if (room.roomId === roomId) {
 							room.lastMessage = this.$store.getters.lastMessage;
 						}
 					}
+					this.fetchMoreRooms();
 				})
 				.catch((error) => console.error(error));
 		},
@@ -476,23 +472,26 @@ export default {
 			this.connection.vue = this;
 			this.connection.onmessage = function(event) {
 				//push message
-				event.preventDefault();
 				var data = JSON.parse(event.data);
+				console.log(data);
 				var message = data.payload;
 				this.vue.getRoomNamebyID(message["room_id"]);
 				if (message["room_id"] !== this.vue.roomId) {
 					this.vue.setLastMessage(message["room_id"], { message });
-					this.vue.sendNotification({
-						userId: message["sender_id"],
-						title: `Tin nhắn mới từ ${this.vue.senderRoomName}`,
-						message:
-							message["username"] + ": " + message["content"],
-						icon:
-							"https://cdn2.iconfinder.com/data/icons/mixed-rounded-flat-icon/512/megaphone-64.png",
-						clickCallback: function() {
-							alert("Thông báo");
-						},
-					});
+					if (message["senderId"] !== this.vue.currentUserId) {
+						this.vue.sendNotification({
+							userId: message["sender_id"],
+							title: `Tin nhắn mới từ ${this.vue.senderRoomName}`,
+							message:
+								message["username"] + ": " + message["content"],
+							icon:
+								"https://cdn2.iconfinder.com/data/icons/mixed-rounded-flat-icon/512/megaphone-64.png",
+							clickCallback: function() {
+								alert("Thông báo");
+							},
+						});
+					}
+					this.vue.fetchMoreRooms();
 					return;
 				}
 				if (this.vue.message_is_exist(message)) {
@@ -506,16 +505,21 @@ export default {
 					new Date(message.created_at).getMinutes();
 				this.vue.messages.push(message);
 				// notification new message
-				this.vue.sendNotification({
-					userId: message["senderId"],
-					title: `Tin nhắn mới từ ${this.vue.senderRoomName}`,
-					message: message["username"] + ": " + message["content"],
-					icon:
-						"https://cdn2.iconfinder.com/data/icons/mixed-rounded-flat-icon/512/megaphone-64.png",
-					clickCallback: function() {
-						alert("Thông báo");
-					},
-				});
+				if (message["senderId"] !== this.vue.currentUserId) {
+					this.vue.sendNotification({
+						userId: message["senderId"],
+						title: `Tin nhắn mới từ ${this.vue.senderRoomName}`,
+						message:
+							message["username"] + ": " + message["content"],
+						icon:
+							"https://cdn2.iconfinder.com/data/icons/mixed-rounded-flat-icon/512/megaphone-64.png",
+						clickCallback: function() {
+							alert("Thông báo");
+						},
+					});
+				}
+				this.fetchMoreRooms();
+				event.preventDefault();
 			};
 
 			// eslint-disable-next-line no-unused-vars
@@ -526,7 +530,33 @@ export default {
 
 			this.connection.onopen = function(event) {
 				event.preventDefault();
-				console.log("Connected");
+				console.log("Connected socket send message");
+			};
+		},
+
+		socketNotify: function() {
+			this.socketNotification = new WebSocket(
+				`${process.env.VUE_APP_NOTIFICATIONS_WS}?token=` + this.token
+			);
+			this.socketNotification.onmessage = (event) => {
+				var data = JSON.parse(event.data);
+				console.log(data);
+				if (
+					data.event_type === "invite" ||
+					data.event_type === "delete"
+				) {
+					this.fetchMoreRooms();
+				}
+				event.preventDefault();
+			};
+
+			this.socketNotification.onopen = (event) => {
+				event.preventDefault();
+				console.log("Connected event notification");
+			};
+
+			this.socketNotification.onerror = (event) => {
+				event.preventDefault();
 			};
 		},
 
@@ -742,6 +772,7 @@ export default {
 					console.log(err);
 				});
 			this.dialogRemove = false;
+			this.fetchMoreRooms();
 		},
 
 		updateRoom(roomId) {
@@ -776,6 +807,8 @@ export default {
 					this.$store.dispatch("addNotification", data);
 					console.log(err);
 				});
+			this.dialogRoom = false;
+			this.fetchMoreRooms();
 		},
 
 		async removeRoom() {
@@ -816,10 +849,8 @@ export default {
 				return;
 			}
 			if (data.userId === this.currentUserId) {
-				console("1");
 				return;
 			}
-			console.log("2");
 			var title = data.title === undefined ? "Notification" : data.title;
 			var clickCallback = data.clickCallback;
 			var message = data.message === undefined ? "null" : data.message;

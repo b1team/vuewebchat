@@ -23,7 +23,6 @@
 				>
 			</v-btn>
 		</v-app-bar>
-
 		<router-view />
 		<notifications :text="notifications.snackText" />
 	</v-app>
@@ -57,6 +56,7 @@ export default {
 			],
 			isMobile: false,
 			iconLogout: mdiLogout,
+			socketNotifiton: null,
 		};
 	},
 	methods: {
@@ -64,7 +64,7 @@ export default {
 			this.$store.dispatch("logout").then(() => {
 				this.$router.push("/login");
 			});
-		},
+		}
 	},
 	mounted() {
 		this.isMobile = window.innerWidth < 500;

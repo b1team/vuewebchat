@@ -41,7 +41,7 @@ const actions = {
 								timestamp: new Date(
 									room.last_message.timestamp
 								).toLocaleDateString("en-GB"),
-
+								date: new Date(room.last_message.timestamp),
 								saved: true,
 								seen: room.last_message.seen,
 								new: true,
@@ -49,7 +49,10 @@ const actions = {
 
 							room_format["lastMessage"] = lastMessage;
 						} else {
-							room_format["lastMessage"] = { content: "" };
+							room_format["lastMessage"] = {
+								content: "",
+								timestamp: "",
+							};
 						}
 						list_rooms.push(room_format);
 					}
