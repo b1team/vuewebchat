@@ -672,7 +672,7 @@ export default {
 			this.addNewRoom = false;
 			this.dialog = false;
 			this.addRoomUsername = "";
-			this.fetchMoreRooms();
+			await this.fetchMoreRooms();
 		},
 
 		inviteUser(roomId) {
@@ -691,15 +691,22 @@ export default {
 			const roomId = this.inviteRoomId;
 			await this.$store
 				.dispatch("addUser", { roomId, memberName })
-				.then(() => {
+				.then((res) => {
+					if (res.name === "Error") {
+						const data = {
+							snackText: `Trong phòng đã có ${memberName}`,
+							snackBool: true,
+						};
+						this.$store.dispatch("addNotification", data);
+					}
 					this.$store.dispatch("addNotification", data);
 				})
-				.catch((err) => console.log(err));
+				.catch((err) => console.log("inviteERR ", err));
 
 			this.inviteRoomId = null;
 			this.invitedUsername = "";
 			this.dialogaddUser = false;
-			this.fetchMoreRooms();
+			await this.fetchMessages();
 		},
 
 		deleteUser(name) {
@@ -720,7 +727,7 @@ export default {
 			await this.$store
 				.dispatch("removeUser", { roomId, userName })
 				.then((response) => {
-					if (!response.success) {
+					if (response.name === "Error") {
 						var data = {
 							snackText: `Có lỗi`,
 							snackBool: true,
@@ -735,7 +742,8 @@ export default {
 			this.removeRoomId = null;
 			this.removeUserName = "";
 			this.dialogDeleteUser = false;
-			this.fetchMoreRooms();
+			await this.fetchMoreRooms();
+			await this.fetchMessages();
 		},
 
 		getoutRoom(roomId) {
@@ -772,7 +780,8 @@ export default {
 					console.log(err);
 				});
 			this.dialogRemove = false;
-			this.fetchMoreRooms();
+			await this.fetchMoreRooms();
+			await this.fetchMessages();
 		},
 
 		updateRoom(roomId) {
@@ -808,7 +817,7 @@ export default {
 					console.log(err);
 				});
 			this.dialogRoom = false;
-			this.fetchMoreRooms();
+			await this.fetchMoreRooms();
 		},
 
 		async removeRoom() {
@@ -823,7 +832,8 @@ export default {
 				})
 				.catch((err) => console.log(err));
 			this.dialogDeleteRoom = false;
-			this.fetchMoreRooms();
+			await this.fetchMoreRooms();
+			await this.fetchMessages();
 		},
 
 		deleteRoom() {
