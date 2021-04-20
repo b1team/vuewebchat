@@ -3,6 +3,7 @@ services:
     web:
         build: .
         stdin_open: true
+        container_name: vuewebchat
         tty: true
         env_file: 
             - .env
