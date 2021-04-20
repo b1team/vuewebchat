@@ -17,7 +17,7 @@
 				<a
 					id="logout"
 					href="javascript:void(0)"
-					@click="$emit('logout')"
+					@click="logout"
 				>
 					<v-icon>{{ iconLogout }}</v-icon></a
 				>
@@ -67,7 +67,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.isMobile = window.innerWidth < 500;
+		this.isMobile = window.innerWidth < 500 ? true : false;
 		window.addEventListener("resize", (ev) => {
 			if (ev.isTrusted) this.isMobile = window.innerWidth < 500;
 		});
