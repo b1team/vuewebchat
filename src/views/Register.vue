@@ -165,9 +165,19 @@ export default {
 				};
 				this.$store
 					.dispatch("register", data)
-					.then(() => {
-						this.$router.push("/login");
-						this.$store.dispatch("addNotification", info);
+					.then((res) => {
+						if (res.name !== "Error") {
+							this.$router.push("/login");
+							this.$store.dispatch("addNotification", info);
+						}
+						else {
+							const info = {
+								snackText: "Tài khoản đã tồn tại",
+								snackBool: true,
+							}
+							this.$store.dispatch("addNotification", info);
+							this.$refs.registerForm.reset();
+						}
 					})
 					.catch((error) => console.log(error));
 			}
