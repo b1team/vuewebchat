@@ -806,6 +806,12 @@ export default {
 			await this.$store
 				.dispatch("updateRoom", info)
 				.then(() => {
+					this.list_rooms.filter(function(room) {
+						if (room.roomId === this.updateRoomId) {
+							room.avatar = this.roomAvatar;
+							room.roomName = this.roomName;
+						}
+					});
 					this.$store.dispatch("addNotification", data);
 				})
 				.catch((err) => {
