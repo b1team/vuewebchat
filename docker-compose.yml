@@ -19,26 +19,10 @@ services:
             # Define the port inside of the Docker service to use
             - traefik.http.services.web.loadbalancer.server.port=80
             # Make Traefik use this domain in HTTP
-            - traefik.http.routers.web-http.entrypoints=http
+            - traefik.http.routers.web-http.entrypoints=front
             - traefik.http.routers.web-http.rule=Host(`chat.localhost`)
             # Use the traefik-public network (declared below)
             - traefik.docker.network=traefik-public
-            # Make Traefik use this domain in HTTPS
-            # - traefik.http.routers.web-https.entrypoints=https
-            # - traefik.http.routers.web-https.rule=Host(`chat.localhost`)
-            # - traefik.http.routers.web-https.tls=true
-            # Use the "le" (Let's Encrypt) resolver
-            # - traefik.http.routers.web-https.tls.certresolver=le
-            # https-redirect middleware to redirect HTTP to HTTPS
-            # - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
-            # - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
-            # Middleware to redirect HTTP to HTTPS
-            # - traefik.http.routers.web-http.middlewares=https-redirect
-            # - traefik.http.routers.web-https.middlewares=admin-auth
-            # default user -> user : password
-            # - traefik.http.middlewares.secured.chain.middlewares=https-only,known-ips,auth
-            # - traefik.http.middlewares.admin-auth.basicauth.headerField=X-WebAuth-User
-            # - traefik.http.middlewares.admin-auth.basicauth.removeheader=true
         networks:
             # Use the public network created to be shared between Traefik and
             # any other service that needs to be publicly available with HTTPS
