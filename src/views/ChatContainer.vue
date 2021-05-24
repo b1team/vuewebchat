@@ -417,7 +417,7 @@ export default {
 			var roomId = room.roomId;
 			const roomInfo = {
 				roomName: room.roomName,
-				avatar: room.avatar ? room.avatar : " ",
+				avatar: room.avatar ? room.avatar : "",
 			};
 			await this.$store
 				.dispatch("fetchRoomMessage", { roomId, roomInfo })
