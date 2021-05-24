@@ -245,12 +245,7 @@ export default {
 			invitedUsername: "",
 			removeRoomId: null,
 			removeUserName: "",
-			menuActions: [
-				{ name: "inviteUser", title: "Mời vào phòng" },
-				{ name: "getoutRoom", title: "Rời phòng" },
-				{ name: "updateRoom", title: "Cập nhập phòng" },
-				{ name: "members", title: "Thành viên" },
-			],
+			menuActions: [],
 			styles: { container: { borderRadius: "4px" } },
 			connection: null,
 			socketNotification: null,
@@ -379,22 +374,18 @@ export default {
 		},
 
 		setDeleteRoom() {
-			const last_index = this.menuActions.length - 1;
-
-			const data = { name: "deleteRoom", title: "Xóa phòng" };
+			const info = [
+				{ name: "inviteUser", title: "Mời vào phòng" },
+				{ name: "getoutRoom", title: "Rời phòng" },
+				{ name: "updateRoom", title: "Cập nhập phòng" },
+				{ name: "members", title: "Thành viên" },
+				{ name: "deleteRoom", title: "Xóa phòng" },
+			];
 
 			if (this.is_owner.owner) {
-				if (this.menuActions[last_index].name == data.name) {
-					return;
-				} else {
-					this.menuActions.push(data);
-				}
+				this.menuActions = info.splice(0, 4);
 			} else {
-				if (this.menuActions[last_index].name == data.name) {
-					this.menuActions.splice(last_index, 1);
-				} else {
-					return;
-				}
+				this.menuActions = info;
 			}
 		},
 
