@@ -75,7 +75,6 @@ const actions = {
 						resolve(response);
 
 					}
-					console.log("roomInfo", roomInfo);
 				})
 				.catch((error) => {
 					reject(error);

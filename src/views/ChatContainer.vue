@@ -207,6 +207,7 @@
 			@room-action-handler="menuActionHandler"
 			@menu-action-handler="menuActionHandler"
 			@toggle-rooms-list="$emit('show-demo-options', $event.opened)"
+			@fetch-data-room="fetchDataRoom"
 		>
 		</chat-window>
 	</div>
@@ -403,10 +404,14 @@ export default {
 			this.roomAvatar = room.avatar;
 		},
 
+		fetchDataRoom({ room }) {
+			this.setOwner(room.roomId);
+			this.setData({ room });
+			this.setDeleteRoom();
+		},
+
 		async fetchMessages({ room, options = {} }) {
 			this.$emit("show-demo-options", false);
-			this.setData({ room });
-			this.setOwner(room.roomId);
 			if (options.reset) this.resetMessages();
 
 			var roomId = room.roomId;
@@ -417,8 +422,8 @@ export default {
 			await this.$store
 				.dispatch("fetchRoomMessage", { roomId, roomInfo })
 				.then(() => (this.messages = this.listMessages));
-			this.setDeleteRoom();
 			this.messagesLoaded = false;
+			this.fetchDataRoom();
 		},
 
 		async sendMessage({ content, roomId }) {
@@ -473,7 +478,6 @@ export default {
 			this.connection.onmessage = function(event) {
 				//push message
 				var data = JSON.parse(event.data);
-				console.log(data);
 				var message = data.payload;
 				this.vue.getRoomNamebyID(message["room_id"]);
 				if (message["room_id"] !== this.vue.roomId) {
@@ -540,7 +544,6 @@ export default {
 			);
 			this.socketNotification.onmessage = (event) => {
 				var data = JSON.parse(event.data);
-				console.log(data);
 				if (
 					data.event_type === "invite" ||
 					data.event_type === "delete"
@@ -787,8 +790,6 @@ export default {
 		updateRoom(roomId) {
 			this.updateRoomId = roomId;
 			this.dialogRoom = true;
-			this.roomName = this.roomInfo.roomName;
-			this.roomAvatar = this.roomInfo.avatar;
 		},
 
 		async updateRoomInfo() {
@@ -837,9 +838,16 @@ export default {
 					this.$store.dispatch("addNotification", data);
 				})
 				.catch((err) => console.log(err));
+			for (var i = 0; i < this.list_rooms.length; i++) {
+				if (this.roomId === this.list_rooms[i]) {
+					var index = i;
+					await this.list_rooms.splice(index, 1);
+					await this.fetchMoreRooms();
+					await this.fetchMessages();
+					break;
+				}
+			}
 			this.dialogDeleteRoom = false;
-			await this.fetchMoreRooms();
-			await this.fetchMessages();
 		},
 
 		deleteRoom() {
