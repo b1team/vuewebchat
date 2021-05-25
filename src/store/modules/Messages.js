@@ -36,7 +36,7 @@ const getters = {
 };
 
 const actions = {
-	fetchRoomMessage({ commit }, {roomId, roomInfo}) {
+	fetchRoomMessage({ commit }, { roomId, roomInfo }) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: "get",
@@ -61,9 +61,13 @@ const actions = {
 							senderId: mess.sender.user_id,
 							username: mess.sender.username,
 							timestamp:
-								new Date(mess.updated_at).addHours(7).getHours() +
+								new Date(mess.updated_at)
+									.addHours(7)
+									.getHours() +
 								":" +
-								("0" + new Date(mess.updated_at).getMinutes()).slice(-2),
+								(
+									"0" + new Date(mess.updated_at).getMinutes()
+								).slice(-2),
 							seen: mess.seen,
 						};
 						index += 1;
@@ -73,7 +77,6 @@ const actions = {
 						}
 						commit("listMessages", { messages, roomInfo });
 						resolve(response);
-
 					}
 				})
 				.catch((error) => {
@@ -97,7 +100,7 @@ const actions = {
 				},
 			})
 				.then((response) => {
-					if(!response.data){
+					if (!response.data) {
 						return;
 					}
 					const newMessage = {
@@ -139,7 +142,7 @@ const actions = {
 		});
 	},
 
-	editMessage({ commit }, { messageId, newContent }) {
+	editMessage({ commit }, { messageId, newContent, room_id }) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: "put",
@@ -147,6 +150,7 @@ const actions = {
 				data: {
 					message_id: messageId,
 					content: newContent,
+					room_id: room_id,
 				},
 				headers: {
 					Authorization: "Bearer " + localStorage.getItem("token"),
@@ -163,11 +167,16 @@ const actions = {
 		});
 	},
 
-	deleteMessage({ commit }, message) {
+	deleteMessage({ commit }, { message, idRoom }) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: "delete",
-				url: "messages/" + message._id,
+				url: "messages",
+				data: {
+					message_id: message._id,
+					room_id: idRoom,
+					index: message.index
+				},
 				headers: {
 					Authorization: "Bearer " + localStorage.getItem("token"),
 				},

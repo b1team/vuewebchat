@@ -345,8 +345,8 @@ export default {
 			return false;
 		},
 
-		async fetchMoreRooms() {
-			await this.$store.dispatch("fetchAllRooms").then(() => {
+		fetchMoreRooms: function() {
+			this.$store.dispatch("fetchAllRooms").then(() => {
 				this.list_rooms = this.rooms.sort(
 					(a, b) =>
 						new Date(b.lastMessage.date) -
@@ -414,7 +414,7 @@ export default {
 				.dispatch("fetchRoomMessage", { roomId, roomInfo })
 				.then(() => (this.messages = this.listMessages));
 			this.messagesLoaded = false;
-			this.fetchDataRoom();
+			this.fetchDataRoom({ room });
 		},
 
 		async sendMessage({ content, roomId }) {
@@ -513,7 +513,7 @@ export default {
 						},
 					});
 				}
-				this.fetchMoreRooms();
+				this.vue.fetchMoreRooms();
 				event.preventDefault();
 			};
 
@@ -541,6 +541,26 @@ export default {
 				) {
 					this.fetchMoreRooms();
 				}
+
+				var idRoom = this.roomId;
+				if (data.event_type === "update") {
+					this.messages.filter(function(mess) {
+						if (
+							mess._id === data.payload.message_id &&
+							idRoom === data.payload.room_id
+						) {
+							mess.content = data.payload.content;
+						}
+					});
+				}
+
+				if (data.event_type === "delete_mess") {
+					if (idRoom === data.payload.room_id) {
+						const index = parseInt(data.payload.index);
+						this.fectMessageAfterDelete(index);
+					}
+				}
+
 				event.preventDefault();
 			};
 
@@ -567,9 +587,11 @@ export default {
 		},
 
 		async editMessage({ messageId, newContent }) {
+			var room_id = this.roomId;
 			await this.$store.dispatch("editMessage", {
 				messageId,
 				newContent,
+				room_id,
 			});
 			const messContent = this.$store.getters.editMessageContent;
 			const messId = this.$store.getters.editMessageId;
@@ -599,9 +621,7 @@ export default {
 			}
 		},
 
-		async deleteMessage({ message }) {
-			await this.$store.dispatch("deleteMessage", message);
-			const index = this.$store.getters.deleteMessage.index;
+		fectMessageAfterDelete(index) {
 			this.messages.splice(index, 1);
 
 			const roomId = this.roomId;
@@ -619,6 +639,13 @@ export default {
 					room.lastMessage = format_lastMessage;
 				}
 			});
+		},
+
+		async deleteMessage({ message }) {
+			const idRoom = this.roomId;
+			await this.$store.dispatch("deleteMessage", { message, idRoom });
+			const index = this.$store.getters.deleteMessage.index;
+			this.fectMessageAfterDelete(index);
 		},
 
 		menuActionHandler({ action, roomId }) {
