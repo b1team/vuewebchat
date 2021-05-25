@@ -92,7 +92,7 @@ export default {
 			(error) => {
 				if (error.response.status === 401) {
 					var data = {
-						snackText: "Phiên đăng nhập hết hạn",
+						snackText: "Đăng nhập thất bại",
 						snackBool: true,
 					};
 					this.$store.dispatch("addNotification", data);
