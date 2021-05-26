@@ -63,6 +63,7 @@
 										label="Nhập lại mật khẩu"
 										counter
 										@click:append="show1 = !show1"
+										@keyup.enter="validate"
 									></v-text-field>
 								</v-col>
 								<v-spacer></v-spacer>

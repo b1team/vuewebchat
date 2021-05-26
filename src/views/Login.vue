@@ -34,6 +34,7 @@
 										hint="Ít nhất 8 ký tự"
 										counter
 										@click:append="show1 = !show1"
+										@keyup.enter="validate"
 									></v-text-field>
 								</v-col>
 								<v-col class="d-flex" cols="12" sm="6" xsm="12">
@@ -56,7 +57,12 @@
 										Đăng nhập
 									</v-btn>
 								</v-col>
-								<v-col class="align" cols="12" xsm="12" align-end>
+								<v-col
+									class="align"
+									cols="12"
+									xsm="12"
+									align-end
+								>
 									Chưa có tài khoản ?
 									<v-btn
 										color="warning"
