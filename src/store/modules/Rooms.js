@@ -175,14 +175,14 @@ const actions = {
 		});
 	},
 
-	getOutRoom({ commit }, { roomId, userName }) {
+	getOutRoom({ commit }, { room_id, username }) {
 		return new Promise((resolve, reject) => {
 			axios({
 				method: "delete",
 				url: "rooms/getout",
 				data: {
-					room_id: roomId,
-					member_name: userName,
+					room_id: room_id,
+					member_name: username,
 				},
 				headers: {
 					Authorization: "Bearer " + localStorage.getItem("token"),
