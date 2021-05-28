@@ -383,9 +383,9 @@ export default {
 			];
 
 			if (this.is_owner.owner) {
-				this.menuActions = info.splice(0, 4);
-			} else {
 				this.menuActions = info;
+			} else {
+				this.menuActions = info.splice(0, 4);
 			}
 		},
 
@@ -719,7 +719,9 @@ export default {
 							snackBool: true,
 						};
 						this.$store.dispatch("addNotification", data);
+						return;
 					}
+					this.setOwner(roomId);
 					this.$store.dispatch("addNotification", data);
 				})
 				.catch((err) => console.log("inviteERR ", err));
@@ -756,6 +758,7 @@ export default {
 						this.$store.dispatch("addNotification", data);
 						return;
 					}
+					this.setOwner(roomId);
 				})
 				.catch((err) => console.log(err));
 
