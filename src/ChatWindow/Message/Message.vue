@@ -125,18 +125,6 @@
 							</template>
 						</audio-player>
 
-						<div v-else class="vac-file-message">
-							<div
-								class="vac-svg-button vac-icon-file"
-								@click.stop="openFile('download')"
-							>
-								<slot name="document-icon">
-									<svg-icon name="document" />
-								</slot>
-							</div>
-							<span>{{ message.content }}</span>
-						</div>
-
 						<div
 							v-if="isAudio && !message.deleted"
 							class="vac-progress-time"

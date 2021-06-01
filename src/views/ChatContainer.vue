@@ -202,7 +202,6 @@
 			@send-message="sendMessage"
 			@edit-message="editMessage"
 			@delete-message="deleteMessage"
-			@open-file="openFile"
 			@add-room="addRoom"
 			@room-action-handler="menuActionHandler"
 			@menu-action-handler="menuActionHandler"
@@ -572,10 +571,6 @@ export default {
 			this.socketNotification.onerror = (event) => {
 				event.preventDefault();
 			};
-		},
-
-		openFile({ message }) {
-			window.open(message.file.url, "_blank");
 		},
 
 		formatTimestamp(date, timestamp) {

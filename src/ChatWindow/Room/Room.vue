@@ -84,7 +84,6 @@
 								:emojis-list="emojisList"
 								:hide-options="hideOptions"
 								@message-action-handler="messageActionHandler"
-								@open-file="openFile"
 								@open-user-tag="openUserTag"
 								@hide-options="hideOptions = $event"
 							>
@@ -266,15 +265,6 @@
 							<slot :name="name" v-bind="data" />
 						</template>
 					</emoji-picker>
-
-					<div
-						class="vac-svg-button"
-						@click="launchFilePicker"
-					>
-						<slot name="paperclip-icon">
-							<svg-icon name="paperclip" />
-						</slot>
-					</div>
 
 					<div
 						v-if="textareaAction"
@@ -940,9 +930,6 @@ export default {
 					setTimeout(() => this.stopRecorder(), 100)
 				}
 			}
-		},
-		openFile({ message, action }) {
-			this.$emit('open-file', { message, action })
 		},
 		openUserTag(user) {
 			this.$emit('open-user-tag', user)

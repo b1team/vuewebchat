@@ -61,7 +61,6 @@
 				@send-message="sendMessage"
 				@edit-message="editMessage"
 				@delete-message="deleteMessage"
-				@open-file="openFile"
 				@menu-action-handler="menuActionHandler"
 				@message-action-handler="messageActionHandler"
 				@textarea-action-handler="textareaActionHandler"
@@ -295,9 +294,6 @@ export default {
 		},
 		deleteMessage(message) {
 			this.$emit("delete-message", { message, roomId: this.room.roomId });
-		},
-		openFile({ message, action }) {
-			this.$emit("open-file", { message, action });
 		},
 		menuActionHandler(ev) {
 			this.$emit("menu-action-handler", {
