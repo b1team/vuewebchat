@@ -137,11 +137,26 @@ export default {
 				};
 				this.$store
 					.dispatch("login", user)
-					.then(() => {
+					.then((response) => {
+						if (response.name === "Error") {
+							const data = {
+								snackText: `Đăng nhập thất bại`,
+								snackBool: true,
+							};
+							this.$store.dispatch("addNotification", data);
+							return;
+						}
 						this.$router.push("/");
 						this.$store.dispatch("addNotification", data);
 					})
-					.catch((err) => console.log(err));
+					.catch((err) => {
+						const data = {
+							snackText: `Đăng nhập thất bại`,
+							snackBool: true,
+						};
+						this.$store.dispatch("addNotification", data);
+						console.log("LOGIN ERROR: ", err);
+					});
 				this.login = true;
 			}
 		},
