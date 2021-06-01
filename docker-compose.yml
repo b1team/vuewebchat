@@ -1,36 +1,16 @@
 version: '3.7'
-services: 
+
+services:
     web:
         build: .
         stdin_open: true
         container_name: vuewebchat
         tty: true
-        env_file: 
+        env_file:
             - .env
-        # ports: 
-        #     - "8000:80"
+        ports:
+            - "9090:80"
         volumes:
             - "/app/node_modules"
             - ".:/app"
         restart: unless-stopped
-        labels:
-            # Enable Traefik for this specific "backend" service
-            - traefik.enable=true
-            # Define the port inside of the Docker service to use
-            - traefik.http.services.web.loadbalancer.server.port=80
-            # Make Traefik use this domain in HTTP
-            - traefik.http.routers.web-http.entrypoints=front
-            - traefik.http.routers.web-http.rule=Host(`chat.localhost`)
-            # Use the traefik-public network (declared below)
-            - traefik.docker.network=traefik-public
-        networks:
-            # Use the public network created to be shared between Traefik and
-            # any other service that needs to be publicly available with HTTPS
-            - traefik-public
-
-volumes:
-    traefik-public-certificates:
-
-networks:
-    traefik-public:
-        external: true
