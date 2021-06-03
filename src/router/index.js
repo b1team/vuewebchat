@@ -32,7 +32,7 @@ const routes = [
 		component: Home,
 		beforeEnter: ifAuthenticated,
 		meta: {
-			title: "Home Chat Page",
+			title: "Phòng chat",
 		},
 	},
 	{
@@ -41,7 +41,7 @@ const routes = [
 		component: Login,
 		beforeEnter: ifNotAuthenticated,
 		meta: {
-			title: "Login",
+			title: "Đăng nhập",
 		},
 	},
 	{
@@ -50,7 +50,7 @@ const routes = [
 		component: Register,
 		beforeEnter: ifNotAuthenticated,
 		meta: {
-			title: "Register",
+			title: "Đăng ký",
 		},
 	},
 	{
@@ -59,7 +59,7 @@ const routes = [
 		component: Profile,
 		beforeEnter: ifAuthenticated,
 		meta: {
-			title: "Profile",
+			title: "Hồ sơ",
 		},
 	},
 	{
