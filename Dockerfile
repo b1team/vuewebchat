@@ -15,9 +15,3 @@ RUN mkdir /app
 COPY --from=build-stage /app/dist /app
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
-
-# production stage run with docker-compose - 404 when reload
-# FROM nginx:stable-alpine as production-stage
-# COPY --from=build-stage /app/dist /usr/share/nginx/html
-# EXPOSE 80
-# CMD ["nginx", "-g", "daemon off;"]
