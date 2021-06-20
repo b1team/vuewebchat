@@ -372,19 +372,25 @@ export default {
 			});
 		},
 
-		setDeleteRoom() {
-			const info = [
+		setRoomAction() {
+			const ownerActions = [
 				{ name: "inviteUser", title: "Mời vào phòng" },
-				{ name: "getoutRoom", title: "Rời phòng" },
 				{ name: "updateRoom", title: "Cập nhập phòng" },
 				{ name: "members", title: "Thành viên" },
 				{ name: "deleteRoom", title: "Xóa phòng" },
 			];
 
+			const memberActions = [
+				{ name: "inviteUser", title: "Mời vào phòng" },
+				{ name: "getoutRoom", title: "Rời phòng" },
+				{ name: "updateRoom", title: "Cập nhập phòng" },
+				{ name: "members", title: "Thành viên" },
+			];
+
 			if (this.is_owner.owner) {
-				this.menuActions = info;
+				this.menuActions = ownerActions;
 			} else {
-				this.menuActions = info.splice(0, 4);
+				this.menuActions = memberActions;
 			}
 		},
 
@@ -397,7 +403,7 @@ export default {
 		fetchDataRoom({ room }) {
 			this.setOwner(room.roomId);
 			this.setData({ room });
-			this.setDeleteRoom();
+			this.setRoomAction();
 		},
 
 		async fetchMessages({ room, options = {} }) {
@@ -420,7 +426,15 @@ export default {
 			const username = this.user.username;
 			await this.$store
 				.dispatch("sendMessages", { content, roomId, username })
-				.then(() => {
+				.then((response) => {
+					if (response.name === "Error") {
+						const data = {
+							snackText: `Bạn không có trong phòng`,
+							snackBool: true,
+						};
+						this.$store.dispatch("addNotification", data);
+						return;
+					}
 					this.messages.push(this.newMessage);
 					for (const room of this.list_rooms) {
 						if (room.roomId === roomId) {
@@ -429,7 +443,14 @@ export default {
 					}
 					this.fetchMoreRooms();
 				})
-				.catch((error) => console.error(error));
+				.catch((error) => {
+					console.error("SEND MESSAGE ERROR: " + error);
+					const data = {
+						snackText: `Bạn không có trong phòng`,
+						snackBool: true,
+					};
+					this.$store.dispatch("addNotification", data);
+				});
 		},
 
 		setLastMessage(roomId, { message }) {
