@@ -103,12 +103,16 @@ const actions = {
 					if (!response.data) {
 						return;
 					}
+					var index = state.listMessages[state.listMessages.length - 1].index + 1;
+					if (index === null) {
+						index = 0;
+					}
 					const newMessage = {
 						_id: response.data.message_id,
 						content: response.data.content,
 						username: username,
 						senderId: response.data.sender_id,
-						index: state.listMessages[state.listMessages.length - 1].index +1,
+						index: index,
 						timestamp:
 							new Date(response.data.created_at)
 								.addHours(7)
