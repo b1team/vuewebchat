@@ -15,8 +15,8 @@
 										></v-img>
 									</v-avatar>
 								</v-col>
-								<v-col cols="12" sm="6" md="4">
-									<h2>Thông tin {{ user.username }}</h2>
+								<v-col cols="12">
+									<h2>Thông tin của: {{ user.username }}</h2>
 									id: {{ user.user_id }}
 								</v-col>
 								<v-col cols="12">
@@ -45,10 +45,10 @@
 					</v-card-text>
 					<v-card-actions>
 						<v-spacer></v-spacer>
-						<v-btn color="blue darken-1" text @click="close">
+						<v-btn class="close" text @click="close">
 							Đóng
 						</v-btn>
-						<v-btn color="blue darken-1" text @click="save">
+						<v-btn class="update" text @click="save">
 							Cập nhập
 						</v-btn>
 					</v-card-actions>
@@ -104,5 +104,15 @@ export default {
 <style scoped>
 #inspire {
 	text-align: center;
+}
+
+.update {
+	color: white;
+	background-color: rgb(73, 123, 230);
+}
+
+.close {
+	color: white;
+	background-color: rgb(162, 167, 177);
 }
 </style>
