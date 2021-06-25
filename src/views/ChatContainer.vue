@@ -793,7 +793,7 @@ export default {
 
 		async getOut() {
 			const data = {
-				snackText: "Thoát phòng thành công",
+				snackText: "Thoát phòng thành công, mời chọn phòng khác",
 				snackBool: true,
 			};
 			var room_id = this.getoutRoomId;
@@ -820,6 +820,8 @@ export default {
 					console.log(err);
 				});
 			this.dialogRemove = false;
+			let i = this.list_rooms.map(item => item.roomId).indexOf(room_id) // find index of your object
+			this.list_rooms.splice(i, 1)
 			await this.fetchMoreRooms();
 			await this.fetchMessages();
 		},
