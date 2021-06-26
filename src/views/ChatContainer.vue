@@ -74,7 +74,7 @@
 				<v-card-title class="headline"> Tạo phòng </v-card-title>
 				<v-card-text>
 					<v-text-field
-						v-model="addRoomUsername"
+						v-model="addNewRoomName"
 						label="Tên phòng"
 						required
 					></v-text-field>
@@ -239,7 +239,7 @@ export default {
 			roomMessage: "",
 			disableForm: false,
 			addNewRoom: null,
-			addRoomUsername: "",
+			addNewRoomName: "",
 			inviteRoomId: null,
 			invitedUsername: "",
 			removeRoomId: null,
@@ -373,24 +373,20 @@ export default {
 		},
 
 		setRoomAction() {
-			const ownerActions = [
+			const actions = [
 				{ name: "inviteUser", title: "Mời vào phòng" },
+				{ name: "getoutRoom", title: "Rời phòng" },
 				{ name: "updateRoom", title: "Cập nhập phòng" },
 				{ name: "members", title: "Thành viên" },
 				{ name: "deleteRoom", title: "Xóa phòng" },
 			];
 
-			const memberActions = [
-				{ name: "inviteUser", title: "Mời vào phòng" },
-				{ name: "getoutRoom", title: "Rời phòng" },
-				{ name: "updateRoom", title: "Cập nhập phòng" },
-				{ name: "members", title: "Thành viên" },
-			];
-
 			if (this.is_owner.owner) {
-				this.menuActions = ownerActions;
+				actions.splice(1, 1);
+				this.menuActions = actions;
 			} else {
-				this.menuActions = memberActions;
+				actions.splice(4, 1);
+				this.menuActions = actions;
 			}
 		},
 
@@ -681,7 +677,6 @@ export default {
 
 		addRoom() {
 			this.resetForms();
-			// this.addNewRoom = true;
 			this.dialog = true;
 		},
 
@@ -689,7 +684,7 @@ export default {
 			this.disableForm = true;
 
 			await this.$store
-				.dispatch("createRoom", this.addRoomUsername)
+				.dispatch("createRoom", this.addNewRoomName)
 				.then(() => {
 					const data = {
 						snackText: "Tạo phòng thành công",
@@ -708,7 +703,7 @@ export default {
 
 			this.addNewRoom = false;
 			this.dialog = false;
-			this.addRoomUsername = "";
+			this.addNewRoomName = "";
 			await this.fetchMoreRooms();
 		},
 
@@ -820,8 +815,9 @@ export default {
 					console.log(err);
 				});
 			this.dialogRemove = false;
-			let i = this.list_rooms.map(item => item.roomId).indexOf(room_id) // find index of your object
-			this.list_rooms.splice(i, 1)
+			let i = this.list_rooms.map((item) => item.roomId).indexOf(room_id); // find index of your object
+			this.list_rooms.splice(i, 1);
+			this.messages = [];
 			await this.fetchMoreRooms();
 			await this.fetchMessages();
 		},
@@ -876,17 +872,15 @@ export default {
 				.then(() => {
 					this.$store.dispatch("addNotification", data);
 				})
-				.catch((err) => console.log(err));
-			for (var i = 0; i < this.list_rooms.length; i++) {
-				if (this.roomId === this.list_rooms[i]) {
-					var index = i;
-					await this.list_rooms.splice(index, 1);
-					await this.fetchMoreRooms();
-					await this.fetchMessages();
-					break;
-				}
-			}
+				.catch((err) => console.log("DELETE ROOM ERROR ", err));
 			this.dialogDeleteRoom = false;
+			var room_id = this.roomId;
+			let i = this.list_rooms.map(item => item.roomId).indexOf(room_id);
+			this.list_rooms.splice(i, 1);
+			this.messages = [];
+			await this.fetchMoreRooms();
+			await this.fetchMessages();
+
 		},
 
 		deleteRoom() {
@@ -900,7 +894,7 @@ export default {
 		resetForms() {
 			this.disableForm = false;
 			this.addNewRoom = null;
-			this.addRoomUsername = "";
+			this.addNewRoomName = "";
 			this.inviteRoomId = null;
 			this.invitedUsername = "";
 			this.removeRoomId = null;
