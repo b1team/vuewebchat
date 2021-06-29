@@ -2,15 +2,15 @@
 
 ## Project setup
 ```
-npm install
+npm install && npm audit fix --force
 ```
 
 ### Compiles and hot-reloads for development
 ```
-create .env
+cp .env.template .env
 change API_URL in .env file
 
-npm run serve
+npm run serve 
 ```
 
 ### Compiles and minifies for production
