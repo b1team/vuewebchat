@@ -14,3 +14,8 @@ change API_URL in .env file
 npm run serve 
 ```
 
+### run with docker
+```
+cp .env.template .env
+docker-compose -f "docker-compose.yml" up -d --build```
+
