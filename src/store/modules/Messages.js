@@ -62,7 +62,7 @@ const actions = {
 							username: mess.sender.username,
 							timestamp:
 								new Date(mess.updated_at)
-									.addHours(7)
+									.addHours(0)
 									.getHours() +
 								":" +
 								(
@@ -115,7 +115,7 @@ const actions = {
 						index: index,
 						timestamp:
 							new Date(response.data.created_at)
-								.addHours(7)
+								.addHours(0)
 								.getHours() +
 							":" +
 							new Date(response.data.created_at).getMinutes(),

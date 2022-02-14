@@ -698,7 +698,7 @@ export default {
 						snackBool: true,
 					};
 					this.store.dispatch("addNotification", data);
-					console.error(err);
+					console.error("CREATE ROOM ERROR:",err);
 				});
 
 			this.addNewRoom = false;
@@ -735,7 +735,7 @@ export default {
 					this.setOwner(roomId);
 					this.$store.dispatch("addNotification", data);
 				})
-				.catch((err) => console.log("inviteERR ", err));
+				.catch((err) => console.log("INVITE MEMBER ERROR: ", err));
 
 			this.inviteRoomId = null;
 			this.invitedUsername = "";
@@ -771,7 +771,7 @@ export default {
 					}
 					this.setOwner(roomId);
 				})
-				.catch((err) => console.log(err));
+				.catch((err) => console.log("DELETE ROOM ERROR:",err));
 
 			this.$store.dispatch("addNotification", data);
 			this.removeRoomId = null;
@@ -812,7 +812,7 @@ export default {
 						snackBool: true,
 					};
 					this.$store.dispatch("addNotification", data);
-					console.log(err);
+					console.log("GET OUT ROOM ERROR:",err);
 				});
 			this.dialogRemove = false;
 			let i = this.list_rooms.map((item) => item.roomId).indexOf(room_id); // find index of your object
@@ -856,7 +856,7 @@ export default {
 						snackBool: true,
 					};
 					this.$store.dispatch("addNotification", data);
-					console.log(err);
+					console.log("UPDATE ROOM ERROR",err);
 				});
 			this.dialogRoom = false;
 			await this.fetchMoreRooms();
