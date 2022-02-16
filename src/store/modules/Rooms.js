@@ -51,7 +51,9 @@ const actions = {
 						} else {
 							room_format["lastMessage"] = {
 								content: "",
-								timestamp: "",
+								timestamp: new Date(room.last_message.timestamp
+								).toLocaleDateString("en-GB"),
+								date: new Date(room.last_message.timestamp),
 							};
 						}
 						list_rooms.push(room_format);

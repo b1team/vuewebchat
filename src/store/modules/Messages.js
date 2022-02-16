@@ -49,7 +49,13 @@ const actions = {
 					const messages = [];
 					var index = 0;
 					const list_messages = response.data.messages;
-					if (list_messages.length == 0) state.messagesLoaded = true;
+					if (list_messages.length == 0) {
+						state.messagesLoaded = false;
+						const messages = []
+						commit("listMessages", { messages, roomInfo });
+						resolve(response);
+						return;
+					}
 					for (const mess of list_messages) {
 						const message = {
 							_id: mess.message_id,
@@ -81,7 +87,7 @@ const actions = {
 				})
 				.catch((error) => {
 					reject(error);
-					console.log("LIST MESSAGE ERROR:", error);
+					// console.log("LIST MESSAGE ERROR:", error);
 				});
 		});
 	},

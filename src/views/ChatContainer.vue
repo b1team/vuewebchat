@@ -411,9 +411,13 @@ export default {
 				roomName: room.roomName,
 				avatar: room.avatar ? room.avatar : "",
 			};
-			await this.$store
+			try {
+				await this.$store
 				.dispatch("fetchRoomMessage", { roomId, roomInfo })
 				.then(() => (this.messages = this.listMessages));
+			} catch (error) {
+				this.messages = [];
+			}
 			this.messagesLoaded = false;
 			this.fetchDataRoom({ room });
 		},
@@ -879,8 +883,6 @@ export default {
 			this.list_rooms.splice(i, 1);
 			this.messages = [];
 			await this.fetchMoreRooms();
-			await this.fetchMessages();
-
 		},
 
 		deleteRoom() {
