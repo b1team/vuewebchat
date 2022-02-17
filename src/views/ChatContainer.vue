@@ -476,6 +476,7 @@ export default {
 			for (const room of this.list_rooms) {
 				if (room.roomId === roomId) {
 					this.senderRoomName = room.roomName;
+					this.roomId = room.roomId;
 					break;
 				}
 			}
@@ -492,9 +493,9 @@ export default {
 				var data = JSON.parse(event.data);
 				var message = data.payload;
 				this.getRoomNamebyID(message["room_id"]);
-				if (message["room_id"] !== this.roomId) {
+				if (message["room_id"] != this.roomId) {
 					this.setLastMessage(message["room_id"], { message });
-					if (message["sender_id"] !== this.currentUserId) {
+					if (message["sender_id"] != this.currentUserId) {
 						this.sendNotification({
 							userId: message["sender_id"],
 							title: `Tin nhắn mới từ ${this.senderRoomName}`,
@@ -520,8 +521,9 @@ export default {
 					":" +
 					("0" + new Date(message.created_at).getMinutes()).slice(-2);
 				this.messages.push(message);
+		
 				// notification new message
-				if (message["sender_id"] !== this.currentUserId) {
+				if (message["sender_id"] != this.currentUserId) {
 					this.sendNotification({
 						userId: message["senderId"],
 						title: `Tin nhắn mới từ ${this.senderRoomName}`,
@@ -561,7 +563,6 @@ export default {
 					data.event_type === "delete"
 				) {
 					this.fetchMoreRooms();
-					this.fetchMessages();
 				}
 
 				var idRoom = this.roomId;
