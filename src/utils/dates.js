@@ -11,7 +11,7 @@ export const parseTimestamp = (timestamp, format = "") => {
 		: timestamp;
 
 	if (format === "HH:mm") {
-		return `${zeroPad(date.addHours(7).getHours(), 2)}:${zeroPad(
+		return `${zeroPad(date.addHours(0).getHours(), 2)}:${zeroPad(
 			date.getMinutes(),
 			2
 		)}`;

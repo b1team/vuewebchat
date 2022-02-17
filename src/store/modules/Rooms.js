@@ -172,6 +172,7 @@ const actions = {
 					resolve(response);
 				})
 				.catch((error) => {
+					console.log("UPDATE",error);
 					reject(error);
 				});
 		});

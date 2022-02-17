@@ -338,14 +338,15 @@ export default {
 		},
 
 		message_is_exist: function(message) {
-			var message_id = message.id;
+			const message_id = message.message_id;
+
 			for (const message of this.messages)
 				if (message_id === message._id) return true;
 			return false;
 		},
 
-		fetchMoreRooms: function() {
-			this.$store.dispatch("fetchAllRooms").then(() => {
+		async fetchMoreRooms () {
+			await this.$store.dispatch("fetchAllRooms").then(() => {
 				this.list_rooms = this.rooms.sort(
 					(a, b) =>
 						new Date(b.lastMessage.date) -
@@ -485,18 +486,20 @@ export default {
 				`${process.env.VUE_APP_CHAT_WS}?token=` + this.token
 			);
 
-			this.connection.vue = this;
-			this.connection.onmessage = function(event) {
+			// this.connection.vue = this;
+			this.connection.onmessage = (event) => {
 				//push message
 				var data = JSON.parse(event.data);
 				var message = data.payload;
-				this.vue.getRoomNamebyID(message["room_id"]);
-				if (message["room_id"] !== this.vue.roomId) {
-					this.vue.setLastMessage(message["room_id"], { message });
-					if (message["senderId"] !== this.vue.currentUserId) {
-						this.vue.sendNotification({
+				this.getRoomNamebyID(message["room_id"]);
+				if (message["room_id"] !== this.roomId) {
+					this.setLastMessage(message["room_id"], { message });
+					if (message["sender_id"] !== this.currentUserId) {
+						console.log("message1", message);
+						console.log("currentUserId1", this.currentUserId);
+						this.sendNotification({
 							userId: message["sender_id"],
-							title: `Tin nhắn mới từ ${this.vue.senderRoomName}`,
+							title: `Tin nhắn mới từ ${this.senderRoomName}`,
 							message:
 								message["username"] + ": " + message["content"],
 							icon:
@@ -506,24 +509,26 @@ export default {
 							},
 						});
 					}
-					this.vue.fetchMoreRooms();
+					this.fetchMoreRooms();
 					return;
 				}
-				if (this.vue.message_is_exist(message)) {
+				if (this.message_is_exist(message)) {
 					return;
 				}
 				message["_id"] = message["message_id"];
 				message["senderId"] = message["sender_id"];
 				message["timestamp"] =
-					new Date(message.created_at).addHours(7).getHours() +
+					("0" + new Date(message.created_at).addHours(0).getHours()).slice(-2) +
 					":" +
-					new Date(message.created_at).getMinutes();
-				this.vue.messages.push(message);
+					("0" + new Date(message.created_at).getMinutes()).slice(-2);
+				this.messages.push(message);
 				// notification new message
-				if (message["senderId"] !== this.vue.currentUserId) {
-					this.vue.sendNotification({
+				if (message["sender_id"] !== this.currentUserId) {
+					console.log("message2", message);
+					console.log("currentUserId2", this.currentUserId);
+					this.sendNotification({
 						userId: message["senderId"],
-						title: `Tin nhắn mới từ ${this.vue.senderRoomName}`,
+						title: `Tin nhắn mới từ ${this.senderRoomName}`,
 						message:
 							message["username"] + ": " + message["content"],
 						icon:
@@ -533,17 +538,17 @@ export default {
 						},
 					});
 				}
-				this.vue.fetchMoreRooms();
+				this.fetchMoreRooms();
 				event.preventDefault();
 			};
 
 			// eslint-disable-next-line no-unused-vars
-			this.connection.onerror = function(event) {
-				this.vue.$store.dispatch("logout");
-				this.vue.$router.push("/login");
+			this.connection.onerror = (event) =>{
+				this.$store.dispatch("logout");
+				this.$router.push("/login");
 			};
 
-			this.connection.onopen = function(event) {
+			this.connection.onopen = (event) => {
 				event.preventDefault();
 				console.log("Connected socket send message");
 			};
@@ -560,6 +565,7 @@ export default {
 					data.event_type === "delete"
 				) {
 					this.fetchMoreRooms();
+					this.fetchMessages();
 				}
 
 				var idRoom = this.roomId;
@@ -736,15 +742,15 @@ export default {
 						this.$store.dispatch("addNotification", data);
 						return;
 					}
+					this.inviteRoomId = null;
+					this.invitedUsername = "";
+					this.dialogaddUser = false;
+					// this.fetchMessages();
 					this.setOwner(roomId);
 					this.$store.dispatch("addNotification", data);
 				})
 				.catch((err) => console.log("INVITE MEMBER ERROR: ", err));
 
-			this.inviteRoomId = null;
-			this.invitedUsername = "";
-			this.dialogaddUser = false;
-			await this.fetchMessages();
 		},
 
 		deleteUser(name) {
@@ -758,10 +764,6 @@ export default {
 			var roomId = this.removeRoomId;
 			var userName = this.removeUserName; // this.removeUserName
 
-			const data = {
-				snackText: `Đã đuổi ${userName} ra khỏi phòng`,
-				snackBool: true,
-			};
 			await this.$store
 				.dispatch("removeUser", { roomId, userName })
 				.then((response) => {
@@ -773,16 +775,18 @@ export default {
 						this.$store.dispatch("addNotification", data);
 						return;
 					}
+					data = {
+						snackText: `Đã đuổi ${userName} ra khỏi phòng`,
+						snackBool: true,
+					};
 					this.setOwner(roomId);
+					this.$store.dispatch("addNotification", data);
+					this.removeRoomId = null;
+					this.removeUserName = "";
+					this.dialogDeleteUser = false;
+					this.fetchMoreRooms();
 				})
 				.catch((err) => console.log("DELETE ROOM ERROR:",err));
-
-			this.$store.dispatch("addNotification", data);
-			this.removeRoomId = null;
-			this.removeUserName = "";
-			this.dialogDeleteUser = false;
-			await this.fetchMoreRooms();
-			await this.fetchMessages();
 		},
 
 		getoutRoom(roomId) {
@@ -843,13 +847,19 @@ export default {
 				avatar: this.roomAvatar,
 			};
 
+			const updateRoomId = this.updateRoomId;
+			const newInfo = {
+				roomName: this.roomName,
+				avatar: this.roomAvatar,
+			};
+
 			await this.$store
 				.dispatch("updateRoom", info)
 				.then(() => {
 					this.list_rooms.filter(function(room) {
-						if (room.roomId === this.updateRoomId) {
-							room.avatar = this.roomAvatar;
-							room.roomName = this.roomName;
+						if (room.roomId === updateRoomId) {
+							room.avatar = newInfo.roomAvatar;
+							room.roomName = newInfo.roomName;
 						}
 					});
 					this.$store.dispatch("addNotification", data);

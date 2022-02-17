@@ -67,9 +67,9 @@ const actions = {
 							senderId: mess.sender.user_id,
 							username: mess.sender.username,
 							timestamp:
-								new Date(mess.updated_at)
+								("0" + new Date(mess.updated_at)
 									.addHours(0)
-									.getHours() +
+									.getHours()).slice(-2) +
 								":" +
 								(
 									"0" + new Date(mess.updated_at).getMinutes()
@@ -109,7 +109,12 @@ const actions = {
 					if (!response.data) {
 						return;
 					}
-					var index = state.listMessages[state.listMessages.length - 1].index + 1;
+					try {
+						var index = state.listMessages[state.listMessages.length - 1].index + 1;
+
+					} catch (error) {
+						index = 0
+					}
 					if (index === null) {
 						index = 0;
 					}
@@ -120,11 +125,11 @@ const actions = {
 						senderId: response.data.sender_id,
 						index: index,
 						timestamp:
-							new Date(response.data.created_at)
+							("0" + new Date(response.data.created_at)
 								.addHours(0)
-								.getHours() +
-							":" +
-							new Date(response.data.created_at).getMinutes(),
+								.getHours()).slice(-2) +
+							":" +(
+							"0" + new Date(response.data.created_at).getMinutes()).slice(-2),
 						seen: response.data.seen,
 						save: true,
 						new: true,
