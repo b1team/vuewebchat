@@ -495,8 +495,6 @@ export default {
 				if (message["room_id"] !== this.roomId) {
 					this.setLastMessage(message["room_id"], { message });
 					if (message["sender_id"] !== this.currentUserId) {
-						console.log("message1", message);
-						console.log("currentUserId1", this.currentUserId);
 						this.sendNotification({
 							userId: message["sender_id"],
 							title: `Tin nhắn mới từ ${this.senderRoomName}`,
@@ -524,8 +522,6 @@ export default {
 				this.messages.push(message);
 				// notification new message
 				if (message["sender_id"] !== this.currentUserId) {
-					console.log("message2", message);
-					console.log("currentUserId2", this.currentUserId);
 					this.sendNotification({
 						userId: message["senderId"],
 						title: `Tin nhắn mới từ ${this.senderRoomName}`,
