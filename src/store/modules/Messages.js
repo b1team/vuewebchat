@@ -56,6 +56,9 @@ const actions = {
 						resolve(response);
 						return;
 					}
+					list_messages.sort((a, b) => {
+						return a.created_at - b.created_at;
+					});
 					for (const mess of list_messages) {
 						const message = {
 							_id: mess.message_id,
