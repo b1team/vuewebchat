@@ -338,7 +338,7 @@ export default {
 		},
 
 		message_is_exist: function(message) {
-			const message_id = message.message_id;
+			const message_id = message._id;
 
 			for (const message of this.messages)
 				if (message_id === message._id) return true;
@@ -436,7 +436,11 @@ export default {
 						this.$store.dispatch("addNotification", data);
 						return;
 					}
-					this.messages.push(this.newMessage);
+					console.log("NEW", this.newMessage)
+					if (!this.message_is_exist(this.newMessage)) {
+						this.messages.push(this.newMessage);
+					}
+					// this.messages.push(this.newMessage);
 					for (const room of this.list_rooms) {
 						if (room.roomId === roomId) {
 							room.lastMessage = this.$store.getters.lastMessage;
@@ -511,16 +515,17 @@ export default {
 					this.fetchMoreRooms();
 					return;
 				}
-				if (this.message_is_exist(message)) {
-					return;
-				}
+
 				message["_id"] = message["message_id"];
 				message["senderId"] = message["sender_id"];
 				message["timestamp"] =
 					("0" + new Date(message.created_at).addHours(0).getHours()).slice(-2) +
 					":" +
 					("0" + new Date(message.created_at).getMinutes()).slice(-2);
-				this.messages.push(message);
+				if (!this.message_is_exist(message)) {
+					this.messages.push(message);
+					return;
+				}
 		
 				// notification new message
 				if (message["sender_id"] != this.currentUserId) {
